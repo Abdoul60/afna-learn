@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — AL-AFNA Learn</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{
+      --bg:#06080e;--sf:#0d1120;--sf2:#131828;--sf3:#192038;
+      --bd:#1e2a45;--bd2:#253050;
+      --gold:#c9a84c;--gold2:#e3c06b;
+      --text:#d8e4f8;--text2:#96aac8;--muted:#4e6080;
+      --ok:#22c55e;--err:#ef4444;--warn:#f59e0b;
+      --blue:#3b72e0;--r:12px;--r2:16px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;}
+
+    /* AUTH GUARD */
+    #authGuard{position:fixed;inset:0;background:#06080e;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;}
+    .spin{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* LAYOUT */
+    .shell{display:flex;min-height:100vh;}
+
+    /* SIDEBAR */
+    .sidebar{width:240px;background:var(--sf);border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:1.5rem 1rem;gap:.4rem;position:sticky;top:0;height:100vh;}
+    .s-logo{display:flex;align-items:center;gap:.6rem;padding:.6rem .8rem;margin-bottom:1rem;}
+    .s-logo-ico{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#8a6018);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .s-logo-ico i{font-size:.8rem;color:#06080e;}
+    .s-logo-n{font-family:'Sora',sans-serif;font-weight:800;font-size:.88rem;}
+    .s-logo-n b{color:var(--gold);}
+    .s-tag{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:.6rem .8rem .3rem;}
+    .s-btn{display:flex;align-items:center;gap:.65rem;padding:.65rem .9rem;border-radius:9px;font-size:.83rem;font-weight:600;cursor:pointer;transition:all .18s;border:none;background:none;color:var(--text2);width:100%;text-align:left;}
+    .s-btn:hover{background:var(--sf2);color:var(--text);}
+    .s-btn.active{background:rgba(201,168,76,.12);color:var(--gold);}
+    .s-btn i{width:16px;text-align:center;flex-shrink:0;}
+    .s-divider{height:1px;background:var(--bd);margin:.5rem 0;}
+    .s-bottom{margin-top:auto;}
+    .s-user{display:flex;align-items:center;gap:.65rem;padding:.7rem .8rem;border-radius:9px;background:var(--sf2);border:1px solid var(--bd);}
+    .s-av{width:30px;height:30px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#06080e;flex-shrink:0;}
+    .s-uname{font-size:.78rem;font-weight:600;}
+    .s-urole{font-size:.65rem;color:var(--gold);}
+
+    /* MAIN */
+    .main{flex:1;padding:2rem 2.5rem;overflow-x:hidden;}
+    .page{display:none;}
+    .page.active{display:block;}
+
+    /* PAGE HEADER */
+    .ph{margin-bottom:2rem;}
+    .ph h1{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:.3rem;}
+    .ph p{color:var(--text2);font-size:.87rem;}
+
+    /* CARDS ROW */
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;}
+    .card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:1.4rem;}
+    .card-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:.9rem;}
+    .card h3{font-size:1.6rem;font-family:'Sora',sans-serif;font-weight:800;margin-bottom:.2rem;}
+    .card p{font-size:.75rem;color:var(--muted);}
+
+    /* TABLE */
+    .tbox{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;}
+    .tbox-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .tbox-hdr{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.4rem;border-bottom:1px solid var(--bd);}
+    .tbox-hdr h2{font-family:'Sora',sans-serif;font-size:1rem;font-weight:700;}
+    .tbl{width:100%;border-collapse:collapse;}
+    .tbl th{text-align:left;padding:.75rem 1.2rem;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--bd);background:var(--sf2);}
+    .tbl td{padding:.9rem 1.2rem;font-size:.83rem;border-bottom:1px solid var(--bd);vertical-align:middle;}
+    .tbl tr:last-child td{border-bottom:none;}
+    .tbl tr:hover td{background:var(--sf2);}
+    .av-sm{width:28px;height:28px;border-radius:50%;background:var(--blue);display:inline-flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:800;color:#fff;margin-right:.55rem;flex-shrink:0;}
+    .urow{display:flex;align-items:center;}
+    .badge{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .65rem;border-radius:100px;font-size:.68rem;font-weight:700;}
+    .b-gold{background:rgba(201,168,76,.12);color:var(--gold);}
+    .b-blue{background:rgba(59,114,224,.12);color:var(--blue);}
+    .b-ok{background:rgba(34,197,94,.1);color:var(--ok);}
+    .b-muted{background:var(--sf3);color:var(--muted);}
+
+    /* PROGRESS BARS */
+    .prog-row{display:flex;flex-direction:column;gap:.25rem;}
+    .prog-bar{height:5px;background:var(--sf3);border-radius:100px;overflow:hidden;}
+    .prog-fill{height:100%;background:var(--gold);border-radius:100px;transition:width .4s ease;}
+    .prog-lbl{font-size:.7rem;color:var(--muted);}
+
+    /* UPLOAD ZONE */
+    .upload-zone{border:2px dashed var(--bd2);border-radius:var(--r2);padding:3rem 2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--sf);}
+    .upload-zone:hover,.upload-zone.drag{border-color:var(--gold);background:rgba(201,168,76,.04);}
+    .upload-zone i{font-size:2.5rem;color:var(--muted);margin-bottom:1rem;display:block;}
+    .upload-zone h3{font-family:'Sora',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.4rem;}
+    .upload-zone p{font-size:.83rem;color:var(--muted);}
+    #fileInput{display:none;}
+    .up-btn{display:inline-flex;align-items:center;gap:.45rem;margin-top:1.2rem;padding:.75rem 1.6rem;background:var(--gold);color:#06080e;border:none;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.87rem;cursor:pointer;transition:all .2s;}
+    .up-btn:hover{background:var(--gold2);}
+
+    /* JSON PREVIEW */
+    .json-box{background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);padding:1.2rem;font-family:monospace;font-size:.78rem;color:var(--text2);max-height:300px;overflow-y:auto;line-height:1.7;white-space:pre-wrap;word-break:break-all;}
+    .json-key{color:#79b8ff;}
+    .json-str{color:#9ecbff;}
+    .json-num{color:var(--gold);}
+    .json-bool{color:var(--ok);}
+
+    /* LOG */
+    .log{background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);padding:1rem;font-size:.78rem;max-height:180px;overflow-y:auto;font-family:monospace;}
+    .log-ok{color:var(--ok);}
+    .log-err{color:var(--err);}
+    .log-info{color:var(--text2);}
+
+    /* GIFT MODAL */
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;}
+    .modal-bg.on{display:flex;}
+    .modal{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:2rem;width:100%;max-width:460px;animation:si .3s ease;}
+    @keyframes si{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .modal h2{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:1.2rem;}
+    .field{margin-bottom:1rem;}
+    .field label{display:block;font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.45rem;}
+    .field input,.field select,.field textarea{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:.72rem .9rem;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.87rem;outline:none;transition:border-color .18s;}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);}
+    .field textarea{resize:vertical;min-height:80px;}
+    .modal-btns{display:flex;gap:.7rem;justify-content:flex-end;margin-top:1.3rem;}
+    .btn-ghost{padding:.7rem 1.3rem;border-radius:8px;border:1px solid var(--bd);background:none;color:var(--text2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:.85rem;font-weight:600;}
+    .btn-gold{padding:.7rem 1.4rem;border-radius:8px;border:none;background:var(--gold);color:#06080e;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:.85rem;font-weight:700;}
+
+    /* MISC */
+    .section-title{font-family:'Sora',sans-serif;font-size:1rem;font-weight:700;margin-bottom:1rem;}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+    .gap{margin-bottom:1.5rem;}
+    .action-btn{display:inline-flex;align-items:center;gap:.35rem;padding:.42rem .85rem;border-radius:7px;font-size:.75rem;font-weight:700;cursor:pointer;border:none;transition:all .18s;}
+    .ab-gold{background:rgba(201,168,76,.1);color:var(--gold);}
+    .ab-gold:hover{background:rgba(201,168,76,.2);}
+    .ab-blue{background:rgba(59,114,224,.1);color:var(--blue);}
+    .ab-blue:hover{background:rgba(59,114,224,.2);}
+    .ab-red{background:rgba(239,68,68,.1);color:var(--err);}
+    .ab-red:hover{background:rgba(239,68,68,.2);}
+    .empty{text-align:center;padding:3rem;color:var(--muted);font-size:.87rem;}
+    .empty i{display:block;font-size:2rem;margin-bottom:.7rem;opacity:.4;}
+    .search-bar{display:flex;align-items:center;gap:.5rem;background:var(--sf2);border:1px solid var(--bd);border-radius:9px;padding:.5rem .85rem;width:240px;}
+    .search-bar i{color:var(--muted);font-size:.82rem;}
+    .search-bar input{background:none;border:none;outline:none;color:var(--text);font-size:.83rem;font-family:'Plus Jakarta Sans',sans-serif;width:100%;}
+    .search-bar input::placeholder{color:var(--muted);}
+
+    @media(max-width:1024px){.cards{grid-template-columns:1fr 1fr;}.row2{grid-template-columns:1fr;}}
+    .hamburger{display:none;position:fixed;top:1rem;left:1rem;z-index:300;width:38px;height:38px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;align-items:center;justify-content:center;cursor:pointer;}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;}
+    @media(max-width:768px){
+      .hamburger{display:flex;}
+      .sidebar{position:fixed;left:-260px;top:0;height:100vh;z-index:250;transition:left .28s ease;}
+      .sidebar.open{left:0;}
+      .sidebar-overlay.on{display:block;}
+      .main{padding:1.5rem 1rem;padding-top:4rem;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- AUTH GUARD -->
+<div id="authGuard">
+  <div class="spin"></div>
+  <span style="color:var(--muted);font-size:.85rem">Vérification des droits…</span>
+</div>
+
+<button class="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars" style="color:var(--text2)"></i></button>
+<div class="sidebar-overlay" id="sOverlay" onclick="toggleSidebar()"></div>
+<div class="shell" id="appShell" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="s-logo">
+      <div class="s-logo-ico"><i class="fa-solid fa-brain"></i></div>
+      <div class="s-logo-n"><b>AL-AFNA</b> Admin</div>
+    </div>
+
+    <div class="s-tag">Navigation</div>
+    <button class="s-btn active" onclick="nav('dashboard',this)"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+    <button class="s-btn" onclick="nav('users',this)"><i class="fa-solid fa-users"></i> Utilisateurs</button>
+    <button class="s-btn" onclick="nav('progress',this)"><i class="fa-solid fa-chart-line"></i> Progressions</button>
+    <button class="s-btn" onclick="nav('import',this)"><i class="fa-solid fa-file-import"></i> Importer JSON</button>
+    <button class="s-btn" onclick="nav('gifts',this)"><i class="fa-solid fa-gift"></i> Cadeaux</button>
+
+    <div class="s-divider"></div>
+    <div class="s-tag">Accès</div>
+    <button class="s-btn" onclick="location.href='categories.html'"><i class="fa-solid fa-arrow-left"></i> Retour au site</button>
+    <button class="s-btn" onclick="logout()" style="color:var(--err)"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</button>
+
+    <div class="s-bottom">
+      <div class="s-user">
+        <div class="s-av" id="sAv">A</div>
+        <div><div class="s-uname" id="sName">Admin</div><div class="s-urole"><i class="fa-solid fa-shield-halved" style="font-size:.6rem;margin-right:.25rem"></i>Administrateur</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="p-dashboard">
+      <div class="ph">
+        <h1>Tableau de bord</h1>
+        <p>Vue d'ensemble de AL-AFNA Learn en temps réel</p>
+      </div>
+
+      <div class="cards" id="statsCards">
+        <div class="card">
+          <div class="card-ico" style="background:rgba(201,168,76,.1)"><i class="fa-solid fa-users" style="color:var(--gold)"></i></div>
+          <h3 id="statUsers">—</h3><p>Utilisateurs inscrits</p>
+        </div>
+        <div class="card">
+          <div class="card-ico" style="background:rgba(59,114,224,.1)"><i class="fa-solid fa-fire" style="color:var(--blue)"></i></div>
+          <h3 id="statActive">—</h3><p>Actifs ce mois</p>
+        </div>
+        <div class="card">
+          <div class="card-ico" style="background:rgba(34,197,94,.1)"><i class="fa-solid fa-circle-check" style="color:var(--ok)"></i></div>
+          <h3 id="statSolved">—</h3><p>Questions résolues (total)</p>
+        </div>
+        <div class="card">
+          <div class="card-ico" style="background:rgba(168,85,247,.1)"><i class="fa-solid fa-book-open" style="color:#a855f7"></i></div>
+          <h3 id="statCats">8</h3><p>Catégories actives</p>
+        </div>
+      </div>
+
+      <div class="tbox">
+        <div class="tbox-hdr">
+          <h2><i class="fa-solid fa-clock-rotate-left" style="color:var(--gold);margin-right:.5rem"></i>Dernières inscriptions</h2>
+        </div>
+        <div class="tbox-scroll"><table class="tbl">
+          <thead><tr><th>Utilisateur</th><th>Email</th><th>Inscrit le</th><th>Action</th></tr></thead>
+          <tbody id="recentUsers"><tr><td colspan="4" class="empty"><i class="fa-solid fa-spinner fa-spin"></i>Chargement…</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ── UTILISATEURS ── -->
+    <div class="page" id="p-users">
+      <div class="ph">
+        <h1>Utilisateurs</h1>
+        <p>Gestion de tous les comptes inscrits</p>
+      </div>
+      <div class="tbox">
+        <div class="tbox-hdr">
+          <h2>Tous les comptes <span id="userCount" style="color:var(--muted);font-weight:400;font-size:.85rem"></span></h2>
+          <div class="search-bar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Rechercher…" oninput="filterUsers(this.value)" id="searchInput">
+          </div>
+        </div>
+        <div class="tbox-scroll"><table class="tbl">
+          <thead><tr><th>Nom</th><th>Email</th><th>Inscrit le</th><th>Plan</th><th>Actions</th></tr></thead>
+          <tbody id="usersTable"><tr><td colspan="5" class="empty"><i class="fa-solid fa-spinner fa-spin"></i>Chargement…</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ── PROGRESSIONS ── -->
+    <div class="page" id="p-progress">
+      <div class="ph">
+        <h1>Progressions</h1>
+        <p>Suivez les avancées de chaque utilisateur par catégorie</p>
+      </div>
+      <div class="tbox">
+        <div class="tbox-hdr">
+          <h2>Détail par utilisateur</h2>
+          <div class="search-bar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Filtrer…" oninput="filterProgress(this.value)" id="searchProg">
+          </div>
+        </div>
+        <div class="tbox-scroll"><table class="tbl">
+          <thead><tr><th>Utilisateur</th><th>Définitions</th><th>Synonymes</th><th>Antonymes</th><th>Séries</th><th>Score global</th><th>Cadeau</th></tr></thead>
+          <tbody id="progressTable"><tr><td colspan="7" class="empty"><i class="fa-solid fa-spinner fa-spin"></i>Chargement…</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ── IMPORT JSON ── -->
+    <div class="page" id="p-import">
+      <div class="ph">
+        <h1>Importer un livre JSON</h1>
+        <p>Uploadez un fichier JSON pour ajouter ou mettre à jour les questions dans Firestore</p>
+      </div>
+
+      <div class="row2 gap">
+        <div>
+          <div class="section-title">📁 Fichier JSON</div>
+          <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <h3>Glissez votre fichier JSON ici</h3>
+            <p>ou cliquez pour parcourir</p>
+            <p style="margin-top:.5rem;font-size:.75rem">Format : eckenschwiller_2016.json</p>
+          </div>
+          <input type="file" id="fileInput" accept=".json" onchange="loadJSON(this.files[0])">
+        </div>
+
+        <div>
+          <div class="section-title">📋 Structure attendue du JSON</div>
+          <div class="json-box">{
+  <span class="json-key">"livre"</span>: <span class="json-str">"Tous les tests psychotechniques"</span>,
+  <span class="json-key">"auteur"</span>: <span class="json-str">"Eckenschwiller"</span>,
+  <span class="json-key">"annee"</span>: <span class="json-num">2016</span>,
+  <span class="json-key">"premium"</span>: <span class="json-bool">false</span>,
+  <span class="json-key">"categories"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-str">"synonymes"</span>,
+      <span class="json-key">"label"</span>: <span class="json-str">"Synonymes"</span>,
+      <span class="json-key">"exercices"</span>: [
+        {
+          <span class="json-key">"numero"</span>: <span class="json-num">1</span>,
+          <span class="json-key">"questions"</span>: [
+            {
+              <span class="json-key">"q"</span>: <span class="json-str">"EXHORTER"</span>,
+              <span class="json-key">"opts"</span>: [<span class="json-str">"Inciter"</span>,<span class="json-str">"Continuer"</span>,...],
+              <span class="json-key">"c"</span>: <span class="json-num">0</span>,
+              <span class="json-key">"e"</span>: <span class="json-str">"EXHORTER = inciter"</span>
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}</div>
+        </div>
+      </div>
+
+      <div class="gap" id="previewSection" style="display:none">
+        <div class="section-title">👁 Aperçu du fichier chargé</div>
+        <div id="previewBox" class="json-box"></div>
+      </div>
+
+      <div class="gap" id="importActions" style="display:none">
+        <button class="up-btn" onclick="importToFirestore()"><i class="fa-solid fa-database"></i> Importer dans Firestore</button>
+        <span style="margin-left:1rem;font-size:.82rem;color:var(--muted)">Les données existantes seront fusionnées, pas supprimées.</span>
+      </div>
+
+      <div class="gap" id="logSection" style="display:none">
+        <div class="section-title">📟 Journal d'importation</div>
+        <div class="log" id="importLog"></div>
+      </div>
+    </div>
+
+    <!-- ── CADEAUX ── -->
+    <div class="page" id="p-gifts">
+      <div class="ph">
+        <h1>Cadeaux & Récompenses</h1>
+        <p>Envoyez des récompenses aux utilisateurs les plus actifs</p>
+      </div>
+
+      <div class="cards" style="grid-template-columns:repeat(3,1fr)">
+        <div class="card" style="border-color:rgba(201,168,76,.2)">
+          <div class="card-ico" style="background:rgba(201,168,76,.1)"><i class="fa-solid fa-trophy" style="color:var(--gold)"></i></div>
+          <h3 id="gTop">—</h3><p>Utilisateur le plus actif</p>
+        </div>
+        <div class="card">
+          <div class="card-ico" style="background:rgba(34,197,94,.1)"><i class="fa-solid fa-medal" style="color:var(--ok)"></i></div>
+          <h3 id="gComplete">—</h3><p>Ont terminé 3+ catégories</p>
+        </div>
+        <div class="card">
+          <div class="card-ico" style="background:rgba(59,114,224,.1)"><i class="fa-solid fa-gift" style="color:var(--blue)"></i></div>
+          <h3 id="gSent">—</h3><p>Cadeaux envoyés ce mois</p>
+        </div>
+      </div>
+
+      <div class="tbox">
+        <div class="tbox-hdr">
+          <h2>Top utilisateurs à récompenser</h2>
+          <button class="action-btn ab-gold" onclick="openGift()"><i class="fa-solid fa-paper-plane"></i> Envoyer un cadeau</button>
+        </div>
+        <div class="tbox-scroll"><table class="tbl">
+          <thead><tr><th>#</th><th>Utilisateur</th><th>Questions résolues</th><th>Catégories finies</th><th>Cadeau reçu</th><th>Action</th></tr></thead>
+          <tbody id="giftTable"><tr><td colspan="6" class="empty"><i class="fa-solid fa-spinner fa-spin"></i>Chargement…</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- GIFT MODAL -->
+<div class="modal-bg" id="giftModal">
+  <div class="modal">
+    <h2><i class="fa-solid fa-gift" style="color:var(--gold);margin-right:.5rem"></i>Envoyer un cadeau</h2>
+    <div class="field">
+      <label>Destinataire</label>
+      <select id="giftUser"></select>
+    </div>
+    <div class="field">
+      <label>Type de cadeau</label>
+      <select id="giftType">
+        <option value="access_pro">Accès Pro gratuit (1 mois)</option>
+        <option value="badge">Badge spécial</option>
+        <option value="message">Message de félicitations</option>
+        <option value="code">Code promotionnel</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Message personnalisé</label>
+      <textarea id="giftMsg" placeholder="Félicitations pour vos efforts ! Voici un cadeau de notre part…"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeGift()">Annuler</button>
+      <button class="btn-gold" onclick="sendGift()"><i class="fa-solid fa-paper-plane"></i> Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+// ================================================================
+// ⚙️  CONFIG FIREBASE — même que les autres fichiers
+// ================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyAmImyMP66zhxIZIqfMm7m60UvUI9SNQqc",
+  authDomain: "afna-learn.firebaseapp.com",
+  projectId: "afna-learn",
+  storageBucket: "afna-learn.firebasestorage.app",
+  messagingSenderId: "725402179817",
+  appId: "1:725402179817:web:b943d0005bd67a9e083878"
+};
+
+// ================================================================
+// ⚙️  TON EMAIL ADMIN — mets ton email Firebase ici
+// ================================================================
+// ================================================================
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+let allUsers = [];
+let allProgress = [];
+let loadedJSON = null;
+
+// ── AUTH CHECK ──────────────────────────────────────────────────
+// La sécurité est dans Firestore : collection "admins" avec ton UID
+auth.onAuthStateChanged(async user => {
+  console.log('🔐 Auth state changed:', user ? 'connecté' : 'déconnecté', user?.email);
+  if(!user){ location.href = 'index.html'; return; }
+  // Vérifie dans Firestore si cet utilisateur est admin
+  try {
+    console.log('👑 Vérification des droits admin pour UID:', user.uid);
+    const adminDoc = await db.collection('admins').doc(user.uid).get();
+    console.log('📄 Document admin trouvé:', adminDoc.exists, adminDoc.data());
+    if(!adminDoc.exists || adminDoc.data().role !== 'admin'){
+      console.log('🚫 Pas admin - redirection');
+      location.href = 'index.html';
+      return;
+    }
+    console.log('✅ Admin validé - chargement du dashboard');
+  } catch(e) {
+    console.error('❌ Erreur vérification admin:', e);
+    location.href = 'index.html';
+    return;
+  }
+  document.getElementById('authGuard').style.display = 'none';
+  document.getElementById('appShell').style.display  = 'flex';
+  const name = user.displayName || user.email.split('@')[0];
+  document.getElementById('sAv').textContent   = name.charAt(0).toUpperCase();
+  document.getElementById('sName').textContent = name.split(' ')[0];
+  loadAll();
+});
+
+// ── NAVIGATION ──────────────────────────────────────────────────
+function nav(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('p-' + page).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+function logout(){ auth.signOut().then(() => location.href = 'index.html'); }
+
+// ── LOAD ALL DATA ───────────────────────────────────────────────
+async function loadAll() {
+  console.log('🔄 loadAll() démarré');
+  try {
+    console.log('📡 Récupération des utilisateurs...');
+    const usersSnap = await db.collection('users').get();
+    console.log('👥 Utilisateurs récupérés:', usersSnap.docs.length);
+    allUsers = usersSnap.docs.map(d => ({id: d.id, ...d.data()}))
+      .sort((a,b) => {
+        const aTime = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+        const bTime = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+        return bTime - aTime; // Plus récent d'abord
+      });
+    console.log('📊 allUsers après traitement:', allUsers.length, allUsers);
+
+    // Stats globales
+    document.getElementById('statUsers').textContent  = allUsers.length;
+    const now = new Date();
+    const active = allUsers.filter(u => {
+      if(!u.lastLogin) return false;
+      const d = u.lastLogin.toDate ? u.lastLogin.toDate() : new Date(u.lastLogin);
+      return (now - d) < 30 * 24 * 3600 * 1000;
+    });
+    document.getElementById('statActive').textContent = active.length;
+
+    // Progressions
+    let totalSolved = 0;
+    allProgress = [];
+    for(const user of allUsers){
+      const snap = await db.collection('progress').doc(user.id).collection('categories').get();
+      const cats = {};
+      let userTotal = 0;
+      snap.docs.forEach(d => { cats[d.id] = d.data().solved || 0; userTotal += cats[d.id]; });
+      allProgress.push({...user, cats, total: userTotal});
+      totalSolved += userTotal;
+    }
+    document.getElementById('statSolved').textContent = totalSolved;
+
+    renderRecentUsers();
+    renderUsersTable();
+    renderProgressTable();
+    renderGiftTable();
+    console.log('✅ loadAll() terminé avec succès');
+  } catch(e) {
+    console.error('❌ Erreur dans loadAll():', e);
+    console.error('Détails:', e.message);
+  }
+}
+
+// ── RECENT USERS TABLE (dashboard) ─────────────────────────────
+function renderRecentUsers() {
+  const tbody = document.getElementById('recentUsers');
+  if(!allUsers.length){ tbody.innerHTML = `<tr><td colspan="4"><div class="empty"><i class="fa-solid fa-users-slash"></i>Aucun utilisateur</div></td></tr>`; return; }
+  tbody.innerHTML = allUsers.slice(0,8).map(u => {
+    const name = u.name || u.email?.split('@')[0] || '—';
+    const date = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('fr-FR') : '—';
+    return `<tr>
+      <td><div class="urow"><span class="av-sm">${name.charAt(0).toUpperCase()}</span>${name}</div></td>
+      <td style="color:var(--text2)">${u.email || '—'}</td>
+      <td style="color:var(--muted)">${date}</td>
+      <td><button class="action-btn ab-gold" onclick="openGiftFor('${u.id}','${name}')"><i class="fa-solid fa-gift"></i> Cadeau</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── USERS TABLE ──────────────────────────────────────────────────
+function renderUsersTable(filter='') {
+  const tbody = document.getElementById('usersTable');
+  const list  = filter ? allUsers.filter(u =>
+    (u.name||'').toLowerCase().includes(filter.toLowerCase()) ||
+    (u.email||'').toLowerCase().includes(filter.toLowerCase())
+  ) : allUsers;
+  document.getElementById('userCount').textContent = `(${list.length})`;
+  if(!list.length){ tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><i class="fa-solid fa-magnifying-glass"></i>Aucun résultat</div></td></tr>`; return; }
+  tbody.innerHTML = list.map(u => {
+    const name = u.name || u.email?.split('@')[0] || '—';
+    const date = u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('fr-FR') : '—';
+    const plan = u.plan === 'pro'
+      ? `<span class="badge b-gold"><i class="fa-solid fa-crown" style="font-size:.6rem"></i> Pro</span>`
+      : `<span class="badge b-muted">Gratuit</span>`;
+    return `<tr>
+      <td><div class="urow"><span class="av-sm">${name.charAt(0).toUpperCase()}</span>${name}</div></td>
+      <td style="color:var(--text2)">${u.email || '—'}</td>
+      <td style="color:var(--muted)">${date}</td>
+      <td>${plan}</td>
+      <td>
+        <button class="action-btn ab-gold" onclick="openGiftFor('${u.id}','${name}')"><i class="fa-solid fa-gift"></i></button>
+        <button class="action-btn ab-blue" onclick="viewProgress('${u.id}')"><i class="fa-solid fa-chart-line"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterUsers(v){ renderUsersTable(v); }
+
+// ── PROGRESS TABLE ───────────────────────────────────────────────
+const CATS = ['definitions','synonymes','antonymes','paronymes','locutions','analogies','intrus','series'];
+const CAT_TOTALS = {definitions:54,synonymes:67,antonymes:49,paronymes:57,locutions:10,analogies:37,intrus:15,series:27};
+const TOTAL_ALL = Object.values(CAT_TOTALS).reduce((a,b)=>a+b,0);
+
+function renderProgressTable(filter=''){
+  const tbody = document.getElementById('progressTable');
+  const list  = filter ? allProgress.filter(u =>
+    (u.name||'').toLowerCase().includes(filter.toLowerCase()) ||
+    (u.email||'').toLowerCase().includes(filter.toLowerCase())
+  ) : allProgress;
+  if(!list.length){ tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><i class="fa-solid fa-chart-line"></i>Aucune progression</div></td></tr>`; return; }
+  tbody.innerHTML = list.map(u => {
+    const name  = u.name || u.email?.split('@')[0] || '—';
+    const pct   = TOTAL_ALL > 0 ? Math.round(u.total / TOTAL_ALL * 100) : 0;
+    const def   = u.cats?.definitions || 0;
+    const syn   = u.cats?.synonymes   || 0;
+    const ant   = u.cats?.antonymes   || 0;
+    const ser   = u.cats?.series      || 0;
+    const mkBar = (val,tot) => {
+      const p = tot > 0 ? Math.round(val/tot*100) : 0;
+      return `<div class="prog-row"><div class="prog-bar"><div class="prog-fill" style="width:${p}%"></div></div><div class="prog-lbl">${val}/${tot}</div></div>`;
+    };
+    return `<tr>
+      <td><div class="urow"><span class="av-sm">${name.charAt(0).toUpperCase()}</span>${name}</div></td>
+      <td>${mkBar(def,CAT_TOTALS.definitions)}</td>
+      <td>${mkBar(syn,CAT_TOTALS.synonymes)}</td>
+      <td>${mkBar(ant,CAT_TOTALS.antonymes)}</td>
+      <td>${mkBar(ser,CAT_TOTALS.series)}</td>
+      <td>
+        <div class="prog-row">
+          <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+          <div class="prog-lbl" style="font-weight:700;color:var(--gold)">${pct}% (${u.total})</div>
+        </div>
+      </td>
+      <td><button class="action-btn ab-gold" onclick="openGiftFor('${u.id}','${name}')"><i class="fa-solid fa-gift"></i> Offrir</button></td>
+    </tr>`;
+  }).join('');
+}
+function filterProgress(v){ renderProgressTable(v); }
+function viewProgress(uid){ nav('progress'); }
+
+// ── GIFT TABLE ───────────────────────────────────────────────────
+function renderGiftTable(){
+  const tbody = document.getElementById('giftTable');
+  const sorted = [...allProgress].sort((a,b) => b.total - a.total);
+  document.getElementById('gTop').textContent = sorted[0]?.name || sorted[0]?.email?.split('@')[0] || '—';
+  const completed = allProgress.filter(u => Object.values(u.cats||{}).filter(v=>v>0).length >= 3).length;
+  document.getElementById('gComplete').textContent = completed;
+  document.getElementById('gSent').textContent = '0';
+  if(!sorted.length){ tbody.innerHTML=`<tr><td colspan="6"><div class="empty"><i class="fa-solid fa-trophy"></i>Aucun utilisateur</div></td></tr>`; return; }
+  tbody.innerHTML = sorted.slice(0,10).map((u,i) => {
+    const name   = u.name || u.email?.split('@')[0] || '—';
+    const cats   = Object.values(u.cats||{}).filter(v=>v>0).length;
+    const medals = ['🥇','🥈','🥉'];
+    return `<tr>
+      <td style="font-weight:700;color:var(--gold)">${medals[i]||i+1}</td>
+      <td><div class="urow"><span class="av-sm">${name.charAt(0).toUpperCase()}</span>${name}</div></td>
+      <td style="font-weight:700">${u.total}</td>
+      <td><span class="badge ${cats>=5?'b-ok':cats>=3?'b-gold':'b-muted'}">${cats} cat.</span></td>
+      <td><span class="badge b-muted">Aucun</span></td>
+      <td><button class="action-btn ab-gold" onclick="openGiftFor('${u.id}','${name}')"><i class="fa-solid fa-gift"></i> Offrir</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── GIFT MODAL ───────────────────────────────────────────────────
+function openGift(){
+  const sel = document.getElementById('giftUser');
+  sel.innerHTML = allUsers.map(u =>
+    `<option value="${u.id}">${u.name||u.email?.split('@')[0]} — ${u.email}</option>`
+  ).join('');
+  document.getElementById('giftModal').classList.add('on');
+}
+function openGiftFor(uid, name){
+  openGift();
+  document.getElementById('giftUser').value = uid;
+}
+function closeGift(){ document.getElementById('giftModal').classList.remove('on'); }
+async function sendGift(){
+  const uid  = document.getElementById('giftUser').value;
+  const type = document.getElementById('giftType').value;
+  const msg  = document.getElementById('giftMsg').value;
+  if(!uid){ alert('Sélectionnez un utilisateur'); return; }
+  try {
+    await db.collection('gifts').add({
+      uid, type, message: msg,
+      sentAt: firebase.firestore.FieldValue.serverTimestamp(),
+      sentBy: auth.currentUser.email,
+      seen: false
+    });
+    // Si Pro → mettre à jour le plan
+    if(type === 'access_pro'){
+      await db.collection('users').doc(uid).update({ plan: 'pro' });
+    }
+    closeGift();
+    alert('Cadeau envoyé avec succès !');
+  } catch(e){ alert('Erreur : ' + e.message); }
+}
+
+// ── JSON IMPORT ──────────────────────────────────────────────────
+function onDrag(e, over){ e.preventDefault(); document.getElementById('dropZone').classList.toggle('drag', over); }
+function onDrop(e){ e.preventDefault(); onDrag(e, false); loadJSON(e.dataTransfer.files[0]); }
+
+function loadJSON(file){
+  if(!file || !file.name.endsWith('.json')){ alert('Fichier JSON uniquement'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      loadedJSON = JSON.parse(e.target.result);
+      const preview = JSON.stringify(loadedJSON, null, 2).substring(0, 1200) + '\n…';
+      document.getElementById('previewBox').textContent = preview;
+      document.getElementById('previewSection').style.display = 'block';
+      document.getElementById('importActions').style.display  = 'block';
+    } catch(err){ alert('JSON invalide : ' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
+function log(msg, type='info'){
+  const el = document.getElementById('importLog');
+  document.getElementById('logSection').style.display = 'block';
+  el.innerHTML += `<div class="log-${type}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+async function importToFirestore(){
+  if(!loadedJSON){ alert('Chargez un fichier JSON d\'abord'); return; }
+  const data = loadedJSON;
+  log(`📖 Livre : ${data.livre || '?'} — ${data.auteur || '?'} (${data.annee || '?'})`, 'info');
+  log(`📂 ${data.categories?.length || 0} catégorie(s) trouvée(s)`, 'info');
+
+  if(!data.categories || !Array.isArray(data.categories)){
+    log('❌ Champ "categories" manquant ou invalide', 'err'); return;
+  }
+
+  for(const cat of data.categories){
+    if(!cat.id){ log(`⚠️ Catégorie sans id ignorée`, 'err'); continue; }
+    try {
+      // Méta de la catégorie
+      await db.collection('categories').doc(cat.id).set({
+        label:   cat.label   || cat.id,
+        livre:   data.livre  || '',
+        auteur:  data.auteur || '',
+        annee:   data.annee  || '',
+        premium: data.premium || false,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      log(`✅ Catégorie "${cat.id}" créée/mise à jour`, 'ok');
+
+      // Exercices
+      for(const ex of (cat.exercices || [])){
+        if(!ex.numero){ log(`⚠️ Exercice sans numéro ignoré dans ${cat.id}`, 'err'); continue; }
+        await db.collection('categories').doc(cat.id)
+          .collection('exercices').doc(String(ex.numero)).set({
+            numero:    ex.numero,
+            titre:     ex.titre || `Exercice ${ex.numero}`,
+            questions: ex.questions || [],
+            count:     (ex.questions || []).length,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        log(`  → Exercice ${ex.numero} : ${(ex.questions||[]).length} questions`, 'info');
+      }
+    } catch(e){ log(`❌ Erreur sur ${cat.id} : ${e.message}`, 'err'); }
+  }
+  log('🎉 Importation terminée !', 'ok');
+}
+
+// ── MOBILE SIDEBAR ────────────────────────────────────────────
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sOverlay').classList.toggle('on');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AL-AFNA Learn — Maîtrisez les Tests Psychotechniques</title>
+  <meta name="description" content="Plateforme d'entraînement aux tests psychotechniques : synonymes, analogies, séries numériques, logique.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{
+      --bg:#06080e;--bg2:#090c16;--sf:#0d1120;--sf2:#131828;--sf3:#192038;
+      --bd:#1e2a45;--bd2:#253050;
+      --gold:#c9a84c;--gold2:#e3c06b;--goldd:rgba(201,168,76,.10);
+      --text:#d8e4f8;--text2:#96aac8;--muted:#4e6080;
+      --ok:#22c55e;--err:#ef4444;--r:12px;--r2:16px;
+    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;overflow-x:hidden;line-height:1.6;}
+
+    /* GLOWS */
+    .glow{position:fixed;border-radius:50%;pointer-events:none;z-index:0;}
+    .g1{width:700px;height:700px;top:-250px;left:-150px;background:radial-gradient(circle,rgba(201,168,76,.05) 0%,transparent 65%);}
+    .g2{width:600px;height:600px;bottom:-150px;right:-100px;background:radial-gradient(circle,rgba(59,114,224,.05) 0%,transparent 65%);}
+
+    /* ─── NAV ─── */
+    nav{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 3rem;border-bottom:1px solid var(--bd);background:rgba(6,8,14,.92);backdrop-filter:blur(14px);position:sticky;top:0;z-index:300;}
+    .logo-w{display:flex;align-items:center;gap:.7rem;text-decoration:none;color:inherit;}
+    .logo-ico{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#8a6018);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .logo-ico i{font-size:.9rem;color:#06080e;}
+    .logo-txt{font-family:'Sora',sans-serif;}
+    .logo-txt .ln1{font-size:1.05rem;font-weight:800;line-height:1.1;color:var(--text);}
+    .logo-txt .ln1 b{color:var(--gold);}
+    .logo-txt .ln2{font-size:.6rem;font-weight:600;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;}
+    .nav-links{display:flex;align-items:center;gap:.4rem;}
+    .btn{display:inline-flex;align-items:center;gap:.45rem;padding:.62rem 1.3rem;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:.855rem;cursor:pointer;transition:all .2s;border:none;text-decoration:none;white-space:nowrap;}
+    .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--bd2);}
+    .btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+    .btn-gold{background:var(--gold);color:#06080e;}
+    .btn-gold:hover{background:var(--gold2);box-shadow:0 4px 24px rgba(201,168,76,.3);transform:translateY(-1px);}
+    .btn-lg{padding:.85rem 2rem;font-size:.93rem;border-radius:10px;}
+
+    /* hamburger */
+    .ham{display:none;background:none;border:1px solid var(--bd2);border-radius:8px;padding:.5rem .65rem;cursor:pointer;color:var(--text2);font-size:1.1rem;align-items:center;justify-content:center;}
+    .ham:hover{border-color:var(--gold);color:var(--gold);}
+    .mob-menu{display:none;flex-direction:column;gap:.5rem;padding:1rem 1.25rem;background:var(--sf);border-bottom:1px solid var(--bd);position:sticky;top:61px;z-index:290;}
+    .mob-menu.open{display:flex;}
+    .mob-menu .btn{justify-content:center;}
+
+    /* ─── HERO ─── */
+    .hero-wrap{position:relative;z-index:1;}
+    .hero{padding:2rem 1.5rem 4.5rem;max-width:860px;margin:0 auto;text-align:center;}
+    .hero-badge{display:inline-flex;align-items:center;gap:.55rem;background:var(--goldd);border:1px solid rgba(201,168,76,.22);color:var(--gold);padding:.42rem 1.1rem;border-radius:100px;font-size:.73rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2.2rem;animation:fu .5s ease both;}
+    .hero h1{font-family:'Sora',sans-serif;font-size:clamp(2rem,5vw,3.7rem);font-weight:800;line-height:1.1;margin-bottom:1.3rem;animation:fu .5s .1s ease both;}
+    .accent{color:var(--gold);position:relative;display:inline-block;}
+    .accent::after{content:'';position:absolute;left:0;bottom:-3px;width:100%;height:2px;background:linear-gradient(90deg,var(--gold),transparent);}
+    .hero-p{font-size:1rem;color:var(--text2);line-height:1.85;max-width:600px;margin:0 auto 2.5rem;animation:fu .5s .2s ease both;}
+    .hero-cta{display:flex;gap:.9rem;flex-wrap:wrap;justify-content:center;animation:fu .5s .3s ease both;}
+    .hero-trust{margin-top:2.2rem;display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap;animation:fu .5s .4s ease both;}
+    .ti{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted);}
+    .ti i{color:var(--gold);font-size:.82rem;}
+
+    /* ─── STATS ─── */
+    .stats-wrap{position:relative;z-index:1;padding:0 1.5rem 4.5rem;}
+    .stats-inner{max-width:880px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;}
+    .stat-box{padding:1.75rem 1.25rem;text-align:center;border-right:1px solid var(--bd);}
+    .stat-box:last-child{border-right:none;}
+    .stat-n{font-family:'Sora',sans-serif;font-size:2.2rem;font-weight:800;color:var(--gold);line-height:1;}
+    .stat-l{font-size:.77rem;color:var(--muted);margin-top:.35rem;}
+    .stat-l i{color:var(--gold);margin-right:.3rem;}
+
+    /* ─── SECTIONS ─── */
+    .section{position:relative;z-index:1;padding:5rem 1.5rem;}
+    .si{max-width:1060px;margin:0 auto;}
+    .bg2{background:var(--bg2);}
+    .stag{display:inline-flex;align-items:center;gap:.45rem;background:var(--goldd);border:1px solid rgba(201,168,76,.18);color:var(--gold);padding:.32rem .85rem;border-radius:100px;font-size:.71rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1rem;}
+    .stitle{font-family:'Sora',sans-serif;font-size:clamp(1.6rem,3.5vw,2.3rem);font-weight:800;margin-bottom:.8rem;}
+    .ssub{color:var(--text2);font-size:.96rem;line-height:1.8;}
+
+    /* ─── WHAT IS IT ─── */
+    .wi-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+    .wi-items{display:flex;flex-direction:column;gap:1.1rem;margin-top:1.8rem;}
+    .wi-item{display:flex;align-items:flex-start;gap:.95rem;padding:1.15rem 1.3rem;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);}
+    .wi-ico{width:40px;height:40px;min-width:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.95rem;}
+    .wi-item h4{font-size:.92rem;font-weight:700;margin-bottom:.2rem;}
+    .wi-item p{font-size:.81rem;color:var(--text2);line-height:1.65;}
+    /* right panel */
+    .wi-panel{display:flex;flex-direction:column;gap:1rem;}
+    .panel-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:1.4rem;}
+    .panel-head{font-size:.69rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;}
+    .panel-head i{color:var(--gold);}
+    .tags-wrap{display:flex;flex-wrap:wrap;gap:.45rem;}
+    .tag{background:var(--sf2);border:1px solid var(--bd);padding:.28rem .75rem;border-radius:100px;font-size:.73rem;color:var(--text2);}
+    .concours-list{display:flex;flex-direction:column;gap:.6rem;}
+    .concours-item{display:flex;align-items:center;gap:.65rem;font-size:.83rem;}
+    .concours-item i{color:var(--gold);font-size:.65rem;flex-shrink:0;}
+
+    /* ─── CAT CARDS (homepage) ─── */
+    .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;}
+    .cath{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2.5rem;}
+    .cat-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:1.5rem;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;}
+    .cat-card .cstrip{position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity .22s;}
+    .cat-card:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,.4);}
+    .cat-card:hover .cstrip{opacity:1;}
+    .cat-ico{width:48px;height:48px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:.9rem;}
+    .cat-card h3{font-family:'Sora',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:.35rem;}
+    .cat-card p{font-size:.8rem;color:var(--text2);line-height:1.65;margin-bottom:.95rem;}
+    .cat-foot{display:flex;align-items:center;justify-content:space-between;padding-top:.8rem;border-top:1px solid var(--bd);font-size:.76rem;color:var(--muted);}
+    .cbadge{font-size:.67rem;font-weight:700;padding:.22rem .65rem;border-radius:100px;text-transform:uppercase;letter-spacing:.05em;}
+    .cfree{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.2);}
+    .cpro{background:var(--goldd);color:var(--gold);border:1px solid rgba(201,168,76,.2);}
+
+    /* ─── STEPS ─── */
+    .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;}
+    .step{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:2rem;position:relative;overflow:hidden;}
+    .step-num{font-family:'Sora',sans-serif;font-size:3.5rem;font-weight:800;color:rgba(201,168,76,.07);line-height:1;margin-bottom:.8rem;}
+    .step-ico{width:46px;height:46px;border-radius:11px;background:var(--goldd);border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;margin-bottom:1.1rem;}
+    .step-ico i{font-size:1.1rem;color:var(--gold);}
+    .step h3{font-family:'Sora',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.5rem;}
+    .step p{font-size:.84rem;color:var(--text2);line-height:1.75;}
+
+    /* ─── METHOD DEMO ─── */
+    .method-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:2.5rem;display:flex;gap:2.5rem;align-items:flex-start;}
+    .ml{flex:1;min-width:0;}
+    .ml h2{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:.7rem;}
+    .ml > p{color:var(--text2);font-size:.92rem;line-height:1.85;margin-bottom:1.4rem;}
+    .tips{display:flex;flex-direction:column;gap:.75rem;}
+    .tip{display:flex;align-items:flex-start;gap:.75rem;font-size:.855rem;color:var(--text2);}
+    .tip i{color:var(--gold);margin-top:.12rem;flex-shrink:0;}
+    .mr{flex:0 0 290px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);padding:1.4rem;}
+    .mr-head{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem;}
+    .mr-head i{color:var(--gold);}
+    .mq{font-size:.83rem;font-weight:600;margin-bottom:.85rem;line-height:1.55;}
+    .mopts{display:flex;flex-direction:column;gap:.45rem;}
+    .mopt{padding:.55rem .85rem;background:var(--sf3);border:1.5px solid var(--bd);border-radius:7px;font-size:.8rem;display:flex;align-items:center;gap:.65rem;}
+    .mopt.ok{border-color:var(--ok);background:rgba(34,197,94,.07);color:#4ade80;}
+    .mopt.ng{border-color:var(--err);background:rgba(239,68,68,.07);}
+    .ml2{width:22px;height:22px;min-width:22px;border-radius:5px;background:var(--sf);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;}
+    .mopt.ok .ml2{background:var(--ok);border-color:var(--ok);color:#06080e;}
+    .mopt.ng .ml2{background:var(--err);border-color:var(--err);color:#fff;}
+    .mdots{display:flex;gap:.35rem;margin-top:.85rem;}
+    .mdot{width:9px;height:9px;border-radius:50%;}
+    .mexpl{margin-top:.9rem;padding:.75rem;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.14);border-radius:7px;font-size:.76rem;color:#4ade80;line-height:1.6;}
+
+    /* ─── TESTIMONIALS ─── */
+    .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem;}
+    .tcard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:1.65rem;}
+    .tstars{color:var(--gold);font-size:.8rem;margin-bottom:.85rem;}
+    .tcard blockquote{font-size:.87rem;color:var(--text2);line-height:1.75;font-style:italic;margin-bottom:1.1rem;}
+    .tauth{display:flex;align-items:center;gap:.7rem;}
+    .tav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;font-family:'Sora',sans-serif;}
+    .tname{font-size:.82rem;font-weight:700;}
+    .trole{font-size:.73rem;color:var(--muted);}
+
+    /* ─── CTA ─── */
+    .cta-s{position:relative;z-index:1;padding:5rem 1.5rem;text-align:center;}
+    .cta-box{max-width:680px;margin:0 auto;background:var(--sf);border:1px solid var(--bd);border-radius:22px;padding:3.5rem 2.5rem;position:relative;overflow:hidden;}
+    .cta-box::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,.08) 0%,transparent 70%);pointer-events:none;}
+    .cta-box h2{font-family:'Sora',sans-serif;font-size:1.85rem;font-weight:800;margin-bottom:.9rem;}
+    .cta-box p{color:var(--text2);margin-bottom:2.2rem;font-size:.92rem;line-height:1.75;}
+    .cta-btns{display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap;}
+
+    /* ─── FOOTER ─── */
+    footer{position:relative;z-index:1;border-top:1px solid var(--bd);padding:2.5rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;}
+    .fbrand{display:flex;align-items:center;gap:.7rem;}
+    .fbrand-text .fn{font-family:'Sora',sans-serif;font-weight:800;font-size:.95rem;}
+    .fbrand-text .fn b{color:var(--gold);}
+    .fbrand-text .fc{font-size:.72rem;color:var(--muted);}
+    .flinks{display:flex;gap:1.8rem;flex-wrap:wrap;}
+    .flinks a{color:var(--muted);text-decoration:none;font-size:.82rem;transition:color .2s;}
+    .flinks a:hover{color:var(--gold);}
+    .fcopy{font-size:.76rem;color:var(--muted);text-align:right;}
+
+    /* ─── MODAL ─── */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .25s;overflow-y:auto;}
+    .overlay.open{opacity:1;pointer-events:all;}
+    .modal{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:2.2rem;width:100%;max-width:420px;position:relative;transform:translateY(18px) scale(.97);transition:transform .25s;margin:auto;}
+    .overlay.open .modal{transform:translateY(0) scale(1);}
+    .mcls{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;}
+    .mcls:hover{color:var(--text);background:var(--sf2);}
+    .mlogo{display:flex;align-items:center;gap:.55rem;margin-bottom:1.3rem;}
+    .mlogo span{font-family:'Sora',sans-serif;font-weight:800;font-size:.92rem;color:var(--gold);}
+    .modal h2{font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:.25rem;}
+    .modal .msub{color:var(--text2);font-size:.85rem;margin-bottom:1.6rem;}
+    .fg{margin-bottom:1rem;}
+    .fg label{display:block;font-size:.73rem;font-weight:700;color:var(--text2);margin-bottom:.38rem;letter-spacing:.05em;text-transform:uppercase;}
+    .fg input{width:100%;padding:.75rem .95rem;background:var(--sf2);border:1px solid var(--bd2);border-radius:8px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s,box-shadow .2s;}
+    .fg input::placeholder{color:var(--muted);}
+    .fg input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
+    .btn-full{width:100%;justify-content:center;padding:.85rem;}
+    .afooter{text-align:center;margin-top:1.2rem;font-size:.82rem;color:var(--muted);}
+    .afooter a{color:var(--gold);font-weight:600;cursor:pointer;text-decoration:none;}
+    .malert{padding:.7rem .95rem;border-radius:7px;font-size:.82rem;margin-bottom:.95rem;display:none;align-items:center;gap:.55rem;}
+    .malert.show{display:flex;}
+    .malert.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;}
+    .malert.ok2{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#4ade80;}
+    .spn{width:16px;height:16px;border:2px solid rgba(6,8,14,.3);border-top-color:#06080e;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;}
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ─── RESPONSIVE ─── */
+    @media(max-width:1024px){
+      .wi-grid{grid-template-columns:1fr;}
+      .wi-panel{display:none;}
+      .cat-grid{grid-template-columns:repeat(2,1fr);}
+      .steps-grid{grid-template-columns:1fr 1fr;}
+      .tgrid{grid-template-columns:1fr 1fr;}
+      .method-card{flex-direction:column;}
+      .mr{width:100%;flex:none;}
+    }
+    @media(max-width:768px){
+      nav{padding:1rem 1.25rem;}
+      .nav-links{display:none;}
+      .ham{display:flex;}
+      .hero{padding:1rem 1rem 3rem;}
+      .stats-inner{grid-template-columns:1fr 1fr;}
+      .stat-box:nth-child(even){border-right:none;}
+      .stat-box:nth-child(1),.stat-box:nth-child(2){border-bottom:1px solid var(--bd);}
+      .cat-grid{grid-template-columns:1fr;}
+      .steps-grid{grid-template-columns:1fr;}
+      .tgrid{grid-template-columns:1fr;}
+      .method-card{padding:1.5rem;}
+      .mr{display:none;}
+      .section{padding:3.5rem 1rem;}
+      .stats-wrap{padding:0 1rem 3.5rem;}
+      footer{flex-direction:column;align-items:flex-start;padding:2rem 1.25rem;gap:1rem;}
+      .fcopy{text-align:left;}
+      .cta-box{padding:2.2rem 1.25rem;}
+      .cta-box h2{font-size:1.5rem;}
+      .hero-trust{gap:1rem;}
+    }
+    @media(max-width:480px){
+      .hero h1{font-size:1.85rem;}
+      .hero-cta{flex-direction:column;align-items:stretch;}
+      .hero-cta .btn{justify-content:center;}
+      .cta-btns{flex-direction:column;align-items:stretch;}
+      .cta-btns .btn{justify-content:center;}
+      .flinks{flex-direction:column;gap:.75rem;}
+    }
+  </style>
+</head>
+<body>
+<div class="glow g1"></div>
+<div class="glow g2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo-w">
+    <div class="logo-ico"><i class="fa-solid fa-brain"></i></div>
+    <div class="logo-txt">
+      <div class="ln1"><b>AL-AFNA</b> Learn</div>
+      <div class="ln2">Psychotechniques</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="#categories" class="btn btn-ghost"><i class="fa-solid fa-table-cells"></i> Catégories</a>
+    <a href="#methode" class="btn btn-ghost"><i class="fa-solid fa-lightbulb"></i> Méthode</a>
+    <button class="btn btn-ghost" onclick="openModal('login')"><i class="fa-regular fa-user"></i> Connexion</button>
+    <button class="btn btn-gold" onclick="openModal('register')">Commencer <i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+  <button class="ham" onclick="toggleMenu()" id="hamBtn" aria-label="Menu">
+    <i class="fa-solid fa-bars" id="hamIco"></i>
+  </button>
+</nav>
+<div class="mob-menu" id="mobMenu">
+  <a href="#categories" class="btn btn-ghost" onclick="closeMobMenu()"><i class="fa-solid fa-table-cells"></i> Catégories</a>
+  <a href="#methode" class="btn btn-ghost" onclick="closeMobMenu()"><i class="fa-solid fa-lightbulb"></i> Méthode</a>
+  <button class="btn btn-ghost" onclick="closeMobMenu();openModal('login')"><i class="fa-regular fa-user"></i> Connexion</button>
+  <button class="btn btn-gold" onclick="closeMobMenu();openModal('register')"><i class="fa-solid fa-rocket"></i> Commencer gratuitement</button>
+</div>
+
+<!-- HERO -->
+<div class="hero-wrap">
+  <div class="hero">
+    <div class="hero-badge"><i class="fa-solid fa-star"></i> Basé sur le livre de référence · Éd. Foucher 2016</div>
+    <h1>Préparez vos concours avec les vrais <span class="accent">tests psychotechniques</span></h1>
+    <p class="hero-p">Synonymes, analogies, séries numériques, locutions, logique… Entraînez-vous question par question avec une méthode progressive. Vous ne passez à la question suivante qu'après avoir trouvé la bonne réponse.</p>
+    <div class="hero-cta">
+      <button class="btn btn-gold btn-lg" onclick="openModal('register')"><i class="fa-solid fa-rocket"></i> Commencer gratuitement</button>
+      <a href="#how" class="btn btn-ghost btn-lg"><i class="fa-solid fa-circle-play"></i> Comment ça marche</a>
+    </div>
+    <div class="hero-trust">
+      <div class="ti"><i class="fa-solid fa-circle-check"></i> Contenu vérifié et expliqué</div>
+      <div class="ti"><i class="fa-solid fa-lock"></i> Sans frais pour démarrer</div>
+      <div class="ti"><i class="fa-solid fa-mobile-screen"></i> 100% mobile</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-wrap">
+  <div class="stats-inner">
+    <div class="stat-box">
+      <div class="stat-n">60+</div>
+      <div class="stat-l"><i class="fa-solid fa-circle-question"></i>Questions réelles</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-n">6</div>
+      <div class="stat-l"><i class="fa-solid fa-layer-group"></i>Catégories</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-n">3</div>
+      <div class="stat-l"><i class="fa-solid fa-rotate-right"></i>Tentatives/question</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-n">100%</div>
+      <div class="stat-l"><i class="fa-solid fa-arrow-trend-up"></i>Progressif</div>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT IS IT -->
+<section class="section bg2">
+  <div class="si">
+    <div class="wi-grid">
+      <div>
+        <span class="stag"><i class="fa-solid fa-circle-info"></i> C'est quoi</span>
+        <h2 class="stitle">Tout savoir sur les tests psychotechniques</h2>
+        <p class="ssub">Ces tests sont utilisés dans de nombreux concours (fonction publique, médical, paramédical, grandes écoles) pour évaluer vos capacités de raisonnement, votre vocabulaire et votre logique.</p>
+        <div class="wi-items">
+          <div class="wi-item">
+            <div class="wi-ico" style="background:rgba(201,168,76,.12)"><i class="fa-solid fa-font" style="color:#c9a84c"></i></div>
+            <div>
+              <h4>Aptitude Verbale</h4>
+              <p>Synonymes, antonymes, analogies, locutions, définitions. Évalue la richesse de votre vocabulaire et votre compréhension linguistique.</p>
+            </div>
+          </div>
+          <div class="wi-item">
+            <div class="wi-ico" style="background:rgba(59,114,224,.12)"><i class="fa-solid fa-calculator" style="color:#3b72e0"></i></div>
+            <div>
+              <h4>Aptitude Numérique</h4>
+              <p>Séries de chiffres, suites logiques, calcul mental, progressions arithmétiques et géométriques.</p>
+            </div>
+          </div>
+          <div class="wi-item">
+            <div class="wi-ico" style="background:rgba(34,197,94,.12)"><i class="fa-solid fa-sitemap" style="color:#22c55e"></i></div>
+            <div>
+              <h4>Raisonnement Logique</h4>
+              <p>Déduction, classification, intrus, analogies visuelles. Teste votre aptitude à analyser et organiser des informations.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wi-panel">
+        <div class="panel-card">
+          <div class="panel-head"><i class="fa-solid fa-brain"></i> Capacités évaluées</div>
+          <div class="tags-wrap">
+            <span class="tag">Raisonnement</span><span class="tag">Analyse</span><span class="tag">Synthèse</span>
+            <span class="tag">Rapidité</span><span class="tag">Vocabulaire</span><span class="tag">Logique verbale</span>
+            <span class="tag">Mémoire</span><span class="tag">Attention</span>
+          </div>
+        </div>
+        <div class="panel-card">
+          <div class="panel-head"><i class="fa-solid fa-trophy"></i> Concours ciblés</div>
+          <div class="concours-list">
+            <div class="concours-item"><i class="fa-solid fa-chevron-right"></i> Fonction publique (cat. A, B, C)</div>
+            <div class="concours-item"><i class="fa-solid fa-chevron-right"></i> Concours paramédicaux (infirmier, sage-femme)</div>
+            <div class="concours-item"><i class="fa-solid fa-chevron-right"></i> Concours bancaires et financiers</div>
+            <div class="concours-item"><i class="fa-solid fa-chevron-right"></i> Tests d'entrée en grandes écoles</div>
+            <div class="concours-item"><i class="fa-solid fa-chevron-right"></i> Entretiens d'embauche et recrutements</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section" id="categories">
+  <div class="si">
+    <div class="cath">
+      <div>
+        <span class="stag"><i class="fa-solid fa-layer-group"></i> Catégories</span>
+        <h2 class="stitle">6 domaines d'entraînement</h2>
+        <p class="ssub">Exercices tirés du livre de référence, méthode expliquée avant chaque quiz.</p>
+      </div>
+      <button class="btn btn-ghost" onclick="openModal('register')">Tout accéder <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+    <div class="cat-grid">
+      <div class="cat-card" onclick="openModal('register')">
+        <div class="cstrip" style="background:#c9a84c"></div>
+        <div class="cat-ico" style="background:rgba(201,168,76,.12)"><i class="fa-solid fa-book-open" style="color:#c9a84c"></i></div>
+        <h3>Tests de Définition</h3>
+        <p>Identifiez la définition d'un mot dans son contexte. Utilisez l'étymologie et le contexte de la phrase.</p>
+        <div class="cat-foot"><span><i class="fa-solid fa-circle-dot"></i> 10 questions</span><span class="cbadge cfree">Gratuit</span></div>
+      </div>
+      <div class="cat-card" onclick="openModal('register')">
+        <div class="cstrip" style="background:#3b72e0"></div>
+        <div class="cat-ico" style="background:rgba(59,114,224,.12)"><i class="fa-solid fa-arrows-left-right" style="color:#3b72e0"></i></div>
+        <h3>Synonymes</h3>
+        <p>Trouvez le mot dont le sens se rapproche le plus du terme en majuscules. Maîtrisez le vocabulaire soutenu.</p>
+        <div class="cat-foot"><span><i class="fa-solid fa-circle-dot"></i> 10 questions</span><span class="cbadge cfree">Gratuit</span></div>
+      </div>
+      <div class="cat-card" onclick="openModal('register')">
+        <div class="cstrip" style="background:#22c55e"></div>
+        <div class="cat-ico" style="background:rgba(34,197,94,.12)"><i class="fa-solid fa-comment-dots" style="color:#22c55e"></i></div>
+        <h3>Proverbes & Locutions</h3>
+        <p>Retrouvez la signification exacte des expressions et proverbes français. Un must pour tout candidat.</p>
+        <div class="cat-foot"><span><i class="fa-solid fa-circle-dot"></i> 10 questions</span><span class="cbadge cfree">Gratuit</span></div>
+      </div>
+      <div class="cat-card" onclick="openModal('register')">
+        <div class="cstrip" style="background:#a855f7"></div>
+        <div class="cat-ico" style="background:rgba(168,85,247,.12)"><i class="fa-solid fa-link" style="color:#a855f7"></i></div>
+        <h3>Analogies Verbales</h3>
+        <p>Identifiez le rapport logique entre deux termes et appliquez-le. Ex : Vache → herbivore, loup → ?</p>
+        <div class="cat-foot"><span><i class="fa-solid fa-circle-dot"></i> 10 questions</span><span class="cbadge cfree">Gratuit</span></div>
+      </div>
+      <div class="cat-card" onclick="openModal('register')">
+        <div class="cstrip" style="background:#ef4444"></div>
+        <div class="cat-ico" style="background:rgba(239,68,68,.12)"><i class="fa-solid fa-magnifying-glass" style="color:#ef4444"></i></div>
+        <h3>Logique des Intrus</h3>
+        <p>Identifiez l'élément qui n'appartient pas à la même catégorie que les autres.</p>
+        <div class="cat-foot"><span><i class="fa-solid fa-circle-dot"></i> 10 questions</span><span class="cbadge cfree">Gratuit</span></div>
+      </div>
+      <div class="cat-card" onclick="openModal('register')">
+        <div class="cstrip" style="background:#06b6d4"></div>
+        <div class="cat-ico" style="background:rgba(6,182,212,.12)"><i class="fa-solid fa-infinity" style="color:#06b6d4"></i></div>
+        <h3>Séries Numériques</h3>
+        <p>Retrouvez la règle d'une suite de nombres et complétez-la. Exercices du livre de référence.</p>
+        <div class="cat-foot"><span><i class="fa-solid fa-circle-dot"></i> 10 questions</span><span class="cbadge cfree">Gratuit</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section bg2" id="how">
+  <div class="si">
+    <div style="text-align:center;margin-bottom:.5rem;">
+      <span class="stag"><i class="fa-solid fa-route"></i> Fonctionnement</span>
+      <h2 class="stitle">Comment ça marche ?</h2>
+      <p class="ssub" style="max-width:520px;margin:0 auto">Un parcours pédagogique conçu pour maximiser la mémorisation active.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-ico"><i class="fa-solid fa-book-open-reader"></i></div>
+        <h3>Lisez la méthode</h3>
+        <p>Avant chaque catégorie, une fiche de méthode vous explique comment aborder les exercices, les pièges à éviter et la stratégie à adopter.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-ico"><i class="fa-solid fa-pencil"></i></div>
+        <h3>Répondez aux questions</h3>
+        <p>3 tentatives par question. Si vous échouez 3 fois, la question se réinitialise silencieusement. La réponse n'est jamais révélée : vous devez la trouver.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-ico"><i class="fa-solid fa-graduation-cap"></i></div>
+        <h3>Comprenez l'explication</h3>
+        <p>Après chaque bonne réponse, une explication détaillée vous indique le raisonnement exact du livre, pour ancrer la connaissance durablement.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METHOD DEMO -->
+<section class="section" id="methode">
+  <div class="si">
+    <div class="method-card">
+      <div class="ml">
+        <span class="stag" style="margin-bottom:1rem"><i class="fa-solid fa-shield-halved"></i> Notre approche</span>
+        <h2>Apprentissage actif, pas passif</h2>
+        <p>La plupart des sites montrent la réponse immédiatement. Nous faisons l'inverse : vous devez chercher, tenter, et trouver. On retient mieux ce qu'on a déduit soi-même.</p>
+        <div class="tips">
+          <div class="tip"><i class="fa-solid fa-circle-check"></i><span>3 tentatives par question — la réponse ne s'affiche jamais avant</span></div>
+          <div class="tip"><i class="fa-solid fa-circle-check"></i><span>Déblocage séquentiel — on avance seulement si on réussit</span></div>
+          <div class="tip"><i class="fa-solid fa-circle-check"></i><span>Explication complète après chaque bonne réponse</span></div>
+          <div class="tip"><i class="fa-solid fa-circle-check"></i><span>Progression sauvegardée — reprenez exactement où vous étiez</span></div>
+        </div>
+      </div>
+      <div class="mr">
+        <div class="mr-head"><i class="fa-solid fa-eye"></i> Aperçu d'une question</div>
+        <div class="mq">Trouvez le synonyme de <strong>OPPROBRE</strong> :</div>
+        <div class="mopts">
+          <div class="mopt ng"><span class="ml2">A</span>Approbation</div>
+          <div class="mopt ng"><span class="ml2">B</span>Fierté</div>
+          <div class="mopt ng"><span class="ml2">C</span>Considération</div>
+          <div class="mopt ok"><span class="ml2"><i class="fa-solid fa-check" style="font-size:.6rem"></i></span>Honte</div>
+        </div>
+        <div class="mdots">
+          <div class="mdot" style="background:var(--err);opacity:.5"></div>
+          <div class="mdot" style="background:var(--err);opacity:.5"></div>
+          <div class="mdot" style="background:var(--ok)"></div>
+        </div>
+        <div class="mexpl"><i class="fa-solid fa-lightbulb" style="margin-right:.4rem"></i><strong>Explication :</strong> OPPROBRE = déshonneur, ignominie → synonyme : HONTE.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS 
+<section class="section bg2">
+  <div class="si">
+    <div style="text-align:center;margin-bottom:2.5rem;">
+      <span class="stag"><i class="fa-solid fa-users"></i> Témoignages</span>
+      <h2 class="stitle">Ce qu'en disent les utilisateurs</h2>
+    </div>
+    <div class="tgrid">
+      <div class="tcard">
+        <div class="tstars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <blockquote>"La méthode progressive est vraiment efficace. On est forcé de réfléchir plutôt que de cliquer au hasard. J'ai nettement amélioré mes résultats en deux semaines."</blockquote>
+        <div class="tauth">
+          <div class="tav" style="background:rgba(201,168,76,.15);color:#c9a84c">A</div>
+          <div><div class="tname">Aminata D.</div><div class="trole">Candidate concours infirmier</div></div>
+        </div>
+      </div>
+      <div class="tcard">
+        <div class="tstars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <blockquote>"Les questions viennent vraiment du livre. Les explications m'ont permis de comprendre des mots que je ne connaissais pas. Un outil sérieux et bien pensé."</blockquote>
+        <div class="tauth">
+          <div class="tav" style="background:rgba(59,114,224,.15);color:#3b72e0">M</div>
+          <div><div class="tname">Moussa K.</div><div class="trole">Candidat fonction publique</div></div>
+        </div>
+      </div>
+      <div class="tcard">
+        <div class="tstars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></div>
+        <blockquote>"Interface propre, questions de qualité. Les catégories sont bien organisées et on voit clairement sa progression. Vraiment utile pour se préparer sérieusement."</blockquote>
+        <div class="tauth">
+          <div class="tav" style="background:rgba(34,197,94,.15);color:#22c55e">F</div>
+          <div><div class="tname">Fatoumata B.</div><div class="trole">Étudiante, Niamey</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>-->
+
+<!-- CTA -->
+<div class="cta-s">
+  <div class="cta-box">
+    <span class="stag" style="margin-bottom:1.3rem"><i class="fa-solid fa-rocket"></i> Commencez maintenant</span>
+    <h2>Votre préparation commence ici</h2>
+    <p>3 catégories gratuites, compte en 30 secondes, aucune carte bancaire nécessaire.</p>
+    <div class="cta-btns">
+      <button class="btn btn-gold btn-lg" onclick="openModal('register')"><i class="fa-solid fa-user-plus"></i> Créer un compte gratuit</button>
+      <button class="btn btn-ghost btn-lg" onclick="openModal('login')"><i class="fa-regular fa-user"></i> J'ai déjà un compte</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fbrand">
+    <div class="logo-ico"><i class="fa-solid fa-brain"></i></div>
+    <div class="fbrand-text">
+      <div class="fn"><b>AL-AFNA</b> Learn</div>
+      <div class="fc">© 2026 AL-AFNA Groupe · Niamey, Niger</div>
+    </div>
+  </div>
+  <div class="flinks">
+    <a href="#categories">Catégories</a>
+    <a href="#how">Méthode</a>
+    <a href="#methode">Aperçu</a>
+  </div>
+  <div class="fcopy">Questions tirées de <em>Tous les tests psychotechniques</em> · Éd. Foucher</div>
+</footer>
+
+<!-- MODAL AUTH -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="mcls" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="mlogo">
+      <div class="logo-ico" style="width:28px;height:28px;border-radius:7px"><i class="fa-solid fa-brain" style="font-size:.75rem;color:#06080e"></i></div>
+      <span>AL-AFNA Learn</span>
+    </div>
+    <h2 id="mTitle">Connexion</h2>
+    <p class="msub" id="mSub">Ravi de vous revoir !</p>
+    <div class="malert" id="mAlert"></div>
+    <div id="nameField" style="display:none">
+      <div class="fg">
+        <label><i class="fa-solid fa-user" style="margin-right:.3rem"></i>Prénom & Nom</label>
+        <input type="text" id="nameIn" placeholder="Votre nom complet">
+      </div>
+    </div>
+    <div class="fg">
+      <label><i class="fa-solid fa-envelope" style="margin-right:.3rem"></i>Adresse e-mail</label>
+      <input type="email" id="emailIn" placeholder="exemple@email.com">
+    </div>
+    <div class="fg">
+      <label><i class="fa-solid fa-lock" style="margin-right:.3rem"></i>Mot de passe</label>
+      <input type="password" id="passIn" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()">
+    </div>
+    <button class="btn btn-gold btn-full" id="authBtn" onclick="doAuth()"><i class="fa-solid fa-right-to-bracket"></i> Se connecter</button>
+    <div class="afooter" id="mSwitch">Pas encore de compte ? <a onclick="switchMode('register')">Créer un compte</a></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAmImyMP66zhxIZIqfMm7m60UvUI9SNQqc",
+  authDomain: "afna-learn.firebaseapp.com",
+  projectId: "afna-learn",
+  storageBucket: "afna-learn.firebasestorage.app",
+  messagingSenderId: "725402179817",
+  appId: "1:725402179817:web:b943d0005bd67a9e083878"
+};
+// ================================================================
+let auth, db;
+try {
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db   = firebase.firestore();
+  auth.onAuthStateChanged(u => { if(u) location.href='categories.html'; });
+} catch(e) { console.warn('Firebase non configuré — mode démo'); }
+
+// Menu hamburger
+function toggleMenu(){
+  const m=document.getElementById('mobMenu');
+  const ic=document.getElementById('hamIco');
+  const open=m.classList.toggle('open');
+  ic.className=open?'fa-solid fa-xmark':'fa-solid fa-bars';
+}
+function closeMobMenu(){
+  document.getElementById('mobMenu').classList.remove('open');
+  document.getElementById('hamIco').className='fa-solid fa-bars';
+}
+
+// Modal
+let mode='login';
+function openModal(m){ switchMode(m); document.getElementById('overlay').classList.add('open'); }
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
+function switchMode(m){
+  mode=m; const r=m==='register';
+  document.getElementById('mTitle').textContent = r?'Créer un compte':'Connexion';
+  document.getElementById('mSub').textContent   = r?'Rejoignez AL-AFNA Learn gratuitement':'Ravi de vous revoir !';
+  document.getElementById('nameField').style.display = r?'block':'none';
+  document.getElementById('authBtn').innerHTML  = r?'<i class="fa-solid fa-user-plus"></i> S\'inscrire':'<i class="fa-solid fa-right-to-bracket"></i> Se connecter';
+  document.getElementById('mSwitch').innerHTML  = r?'Déjà un compte ? <a onclick="switchMode(\'login\')">Se connecter</a>':'Pas encore de compte ? <a onclick="switchMode(\'register\')">Créer un compte</a>';
+  document.getElementById('mAlert').className='malert';
+}
+async function doAuth(){
+  const email=document.getElementById('emailIn').value.trim();
+  const pass=document.getElementById('passIn').value;
+  const btn=document.getElementById('authBtn');
+  if(!email||!pass){return showAlert('Remplissez tous les champs.','err');}
+  if(!auth){return showAlert('Firebase non configuré. Collez votre config.','err');}
+  btn.innerHTML='<span class="spn"></span> Chargement…'; btn.disabled=true;
+  try{
+    if(mode==='register'){
+      const name=document.getElementById('nameIn').value.trim();
+      if(!name){btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-user-plus"></i> S\'inscrire';return showAlert('Entrez votre nom.','err');}
+      const {user}=await auth.createUserWithEmailAndPassword(email,pass);
+      await user.updateProfile({displayName:name});
+      await db.collection('users').doc(user.uid).set({name,email,createdAt:firebase.firestore.FieldValue.serverTimestamp(),plan:'free'});
+    }else{await auth.signInWithEmailAndPassword(email,pass);}
+    location.href='categories.html';
+  }catch(e){
+    const msgs={'auth/user-not-found':'Aucun compte trouvé.','auth/wrong-password':'Mot de passe incorrect.','auth/email-already-in-use':'Email déjà utilisé.','auth/weak-password':'6 caractères minimum.','auth/invalid-email':'Email invalide.','auth/invalid-credential':'Identifiants incorrects.'};
+    showAlert(msgs[e.code]||'Erreur : '+e.message,'err');
+  }finally{btn.disabled=false;btn.innerHTML=mode==='register'?'<i class="fa-solid fa-user-plus"></i> S\'inscrire':'<i class="fa-solid fa-right-to-bracket"></i> Se connecter';}
+}
+function showAlert(msg,type){const el=document.getElementById('mAlert');el.innerHTML='<i class="fa-solid fa-'+(type==='err'?'circle-xmark':'circle-check')+'"></i> '+msg;el.className='malert '+type+' show';}
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+</script>
+</body>
+</html>

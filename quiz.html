@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz — AL-AFNA Learn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{
+      --bg:#06080e;--sf:#0d1120;--sf2:#131828;--sf3:#192038;
+      --bd:#1e2a45;--bd2:#253050;
+      --gold:#c9a84c;--gold2:#e3c06b;--goldd:rgba(201,168,76,.10);
+      --text:#d8e4f8;--text2:#96aac8;--muted:#4e6080;
+      --ok:#22c55e;--err:#ef4444;--r:12px;--r2:16px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+    .glow{position:fixed;border-radius:50%;pointer-events:none;z-index:0;}
+    .g1{width:600px;height:600px;top:-150px;left:-100px;background:radial-gradient(circle,rgba(201,168,76,.05) 0%,transparent 65%);}
+    .g2{width:500px;height:500px;bottom:-100px;right:-80px;background:radial-gradient(circle,rgba(59,114,224,.05) 0%,transparent 65%);}
+
+    /* NAV */
+    nav{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:1rem 2.5rem;border-bottom:1px solid var(--bd);background:rgba(6,8,14,.92);backdrop-filter:blur(14px);position:sticky;top:0;z-index:200;}
+    .logo-w{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:inherit;flex-shrink:0;}
+    .logo-ico{width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,var(--gold),#8a6018);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .logo-ico i{font-size:.78rem;color:#06080e;}
+    .logo-n{font-family:'Sora',sans-serif;font-weight:800;font-size:.92rem;}
+    .logo-n b{color:var(--gold);}
+    .cpill{display:inline-flex;align-items:center;gap:.45rem;padding:.38rem .9rem;border-radius:100px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+    .bback{display:flex;align-items:center;gap:.45rem;color:var(--muted);font-size:.82rem;border:1px solid var(--bd);padding:.48rem .95rem;border-radius:8px;cursor:pointer;background:none;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;flex-shrink:0;}
+    .bback:hover{color:var(--text);border-color:var(--bd2);}
+
+    /* TOP BAR */
+    .topbar{position:sticky;top:58px;z-index:100;background:var(--bg);}
+    .tbtr{height:3px;background:var(--sf2);}
+    .tbfi{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .5s ease;}
+
+    /* MAIN */
+    main{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;padding:2.5rem 1.25rem 5rem;}
+    .ldwrap{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:4rem;}
+    .loader{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
+
+    /* ── METHOD SCREEN ── */
+    .ms{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:2.25rem;width:100%;max-width:660px;animation:si .35s ease;display:none;}
+    .ms-tag{display:inline-flex;align-items:center;gap:.45rem;font-size:.7rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;}
+    .ms h2{font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:.65rem;}
+    .ms-intro{color:var(--text2);font-size:.9rem;line-height:1.8;margin-bottom:1.5rem;}
+    .ms-rules{display:flex;flex-direction:column;gap:.8rem;margin-bottom:1.5rem;padding:1.25rem;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);}
+    .ms-rule{display:flex;align-items:flex-start;gap:.7rem;font-size:.855rem;color:var(--text2);line-height:1.65;}
+    .ms-rule i{color:var(--gold);margin-top:.1rem;flex-shrink:0;width:16px;text-align:center;}
+    .ms-ex{background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);padding:1.2rem;margin-bottom:1.75rem;}
+    .ms-ex-head{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.7rem;display:flex;align-items:center;gap:.38rem;}
+    .ms-ex-head i{color:var(--gold);}
+    .ms-ex-q{font-size:.87rem;font-weight:600;margin-bottom:.7rem;line-height:1.55;}
+    .ms-ex-opts{display:flex;flex-direction:column;gap:.38rem;}
+    .ms-eo{padding:.48rem .82rem;background:var(--sf3);border:1.5px solid var(--bd);border-radius:7px;font-size:.8rem;display:flex;align-items:center;gap:.6rem;}
+    .ms-eo.ok{border-color:var(--ok);background:rgba(34,197,94,.07);color:#4ade80;}
+    .ms-el{width:22px;height:22px;min-width:22px;border-radius:5px;background:var(--sf);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:.67rem;font-weight:700;}
+    .ms-eo.ok .ms-el{background:var(--ok);border-color:var(--ok);color:#06080e;}
+    .ms-expl{margin-top:.8rem;padding:.72rem;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.12);border-radius:7px;font-size:.76rem;color:var(--text2);line-height:1.6;}
+    .ms-btn{width:100%;padding:.9rem;background:var(--gold);color:#06080e;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.55rem;transition:all .2s;}
+    .ms-btn:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 4px 18px rgba(201,168,76,.28);}
+
+    /* ── QUIZ CARD ── */
+    .qcard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:2.25rem;width:100%;max-width:660px;display:none;animation:si .35s ease;}
+
+    .qhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;padding-bottom:1.3rem;border-bottom:1px solid var(--bd);}
+    .qnum{font-size:.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;}
+    .qnum strong{font-family:'Sora',sans-serif;font-size:.98rem;color:var(--gold);}
+    .attrow{display:flex;align-items:center;gap:.45rem;}
+    .attlbl{font-size:.72rem;color:var(--muted);}
+    .adot{width:10px;height:10px;border-radius:50%;transition:all .25s;}
+    .don{background:var(--gold);}
+    .doff{background:var(--err);opacity:.55;}
+
+    .qtext{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:600;line-height:1.6;margin-bottom:1.75rem;}
+
+    .opts{display:flex;flex-direction:column;gap:.65rem;}
+    .opt{display:flex;align-items:center;gap:.9rem;padding:.95rem 1.1rem;background:var(--sf2);border:1.5px solid var(--bd);border-radius:10px;cursor:pointer;transition:border-color .18s,background .18s;font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;color:var(--text);width:100%;text-align:left;}
+    .opt:hover:not(:disabled){border-color:var(--gold);background:rgba(201,168,76,.05);}
+    .opt:disabled{cursor:not-allowed;}
+    .oltr{width:30px;height:30px;min-width:30px;border-radius:7px;background:var(--sf3);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:700;transition:all .18s;flex-shrink:0;}
+    .opt:hover:not(:disabled) .oltr{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold);}
+    .opt.correct{border-color:var(--ok)!important;background:rgba(34,197,94,.07)!important;}
+    .opt.correct .oltr{background:var(--ok);border-color:var(--ok);color:#06080e;}
+    .opt.wrong{border-color:var(--err)!important;background:rgba(239,68,68,.07)!important;}
+    .opt.wrong .oltr{background:var(--err);border-color:var(--err);color:#fff;}
+
+    /* Feedback */
+    .fb{margin-top:1.3rem;padding:.9rem 1rem;border-radius:10px;font-size:.85rem;display:none;align-items:flex-start;gap:.65rem;line-height:1.55;}
+    .fb.show{display:flex;}
+    .fb.ok{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);color:#4ade80;}
+    .fb.err{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#f87171;}
+    .fb.warn{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2);color:var(--gold);}
+    .fb>i{flex-shrink:0;margin-top:.1rem;}
+    .fb-expl{font-size:.8rem;color:var(--text2);margin-top:.3rem;padding-top:.3rem;border-top:1px solid rgba(255,255,255,.05);}
+
+    /* Next btn */
+    .next-btn{display:none;width:100%;margin-top:1.1rem;padding:.9rem;background:var(--gold);color:#06080e;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;align-items:center;justify-content:center;gap:.55rem;}
+    .next-btn.on{display:flex;}
+    .next-btn:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 4px 18px rgba(201,168,76,.28);}
+
+    /* ── COMPLETION ── */
+    .done-card{display:none;background:var(--sf);border:1.5px solid rgba(34,197,94,.2);border-radius:var(--r2);padding:2.75rem 2.25rem;text-align:center;max-width:560px;width:100%;animation:si .4s ease;}
+    .done-card.on{display:block;}
+    .done-ico{width:72px;height:72px;border-radius:50%;background:rgba(34,197,94,.1);border:2px solid rgba(34,197,94,.22);display:flex;align-items:center;justify-content:center;margin:0 auto 1.3rem;font-size:1.8rem;color:var(--ok);}
+    .done-card h2{font-family:'Sora',sans-serif;font-size:1.65rem;font-weight:800;margin-bottom:.65rem;}
+    .done-stats{display:flex;justify-content:center;gap:2.5rem;margin:1.3rem 0 1.75rem;}
+    .ds .n{font-family:'Sora',sans-serif;font-size:1.9rem;font-weight:800;color:var(--gold);}
+    .ds .l{font-size:.76rem;color:var(--muted);margin-top:.15rem;}
+    .done-card>p{color:var(--text2);font-size:.88rem;line-height:1.75;margin-bottom:1.75rem;}
+    .done-btns{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;}
+    .done-btns button{display:inline-flex;align-items:center;gap:.45rem;padding:.8rem 1.65rem;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .2s;border:none;}
+    .db-gold{background:var(--gold);color:#06080e;}
+    .db-gold:hover{background:var(--gold2);}
+    .db-ghost{background:transparent;color:var(--text);border:1px solid var(--bd)!important;}
+    .db-ghost:hover{border-color:var(--bd2)!important;}
+
+    @keyframes si{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes fadeout{from{opacity:1}to{opacity:0}}
+
+    @media(max-width:640px){
+      nav{padding:.9rem 1.1rem;gap:.5rem;}
+      .logo-n{display:none;}
+      main{padding:2rem 1rem 4rem;}
+      .qcard,.ms{padding:1.5rem;}
+      .qtext{font-size:1rem;}
+      .done-card{padding:2rem 1.25rem;}
+    }
+    @media(max-width:380px){
+      .done-btns{flex-direction:column;align-items:stretch;}
+      .done-btns button{justify-content:center;}
+    }
+  </style>
+</head>
+<body>
+<div id="authGuard" style="position:fixed;inset:0;background:#06080e;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;">
+  <div style="width:36px;height:36px;border:3px solid #1e2a45;border-top-color:#c9a84c;border-radius:50%;animation:spin .7s linear infinite"></div>
+  <span style="color:#4e6080;font-size:.85rem;font-family:'Plus Jakarta Sans',sans-serif">Vérification du compte…</span>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</div>
+<div class="glow g1"></div>
+<div class="glow g2"></div>
+
+<nav>
+  <a href="categories.html" class="logo-w">
+    <div class="logo-ico"><i class="fa-solid fa-brain"></i></div>
+    <span class="logo-n"><b>AL-AFNA</b> Learn</span>
+  </a>
+  <div class="cpill" id="catPill" style="display:none"></div>
+  <button class="bback" onclick="location.href='categories.html'"><i class="fa-solid fa-arrow-left"></i> Retour</button>
+</nav>
+
+<div class="topbar"><div class="tbtr"><div class="tbfi" id="topBar" style="width:0%"></div></div></div>
+
+<main>
+  <div class="ldwrap" id="ldState">
+    <div class="loader"></div>
+    <span style="color:var(--muted);font-size:.86rem">Chargement…</span>
+  </div>
+
+  <div class="ms" id="msScreen">
+    <div class="ms-tag"><i class="fa-solid fa-book-open-reader"></i> Méthode avant de commencer</div>
+    <h2 id="msTitle">—</h2>
+    <p class="ms-intro" id="msIntro">—</p>
+    <div class="ms-rules" id="msRules"></div>
+    <div class="ms-ex" id="msEx" style="display:none">
+      <div class="ms-ex-head"><i class="fa-solid fa-eye"></i> Exemple du livre</div>
+      <div class="ms-ex-q" id="msExQ"></div>
+      <div class="ms-ex-opts" id="msExOpts"></div>
+      <div class="ms-expl" id="msExpl"></div>
+    </div>
+    <button class="ms-btn" onclick="startQuiz()"><i class="fa-solid fa-play"></i> Démarrer les exercices</button>
+  </div>
+
+  <div class="qcard" id="qCard">
+    <div class="qhdr">
+      <div class="qnum">Question <strong id="qN">1</strong> / <strong id="qT">—</strong></div>
+      <div class="attrow">
+        <span class="attlbl">Tentatives :</span>
+        <div class="adot don" id="d1"></div>
+        <div class="adot don" id="d2"></div>
+        <div class="adot don" id="d3"></div>
+      </div>
+    </div>
+    <div class="qtext" id="qTxt">—</div>
+    <div class="opts" id="optsWrap"></div>
+    <div class="fb" id="fb"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQ()"><i class="fa-solid fa-arrow-right"></i> Question suivante</button>
+  </div>
+
+  <div class="done-card" id="doneCard"></div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAmImyMP66zhxIZIqfMm7m60UvUI9SNQqc",
+  authDomain: "afna-learn.firebaseapp.com",
+  projectId: "afna-learn",
+  storageBucket: "afna-learn.firebasestorage.app",
+  messagingSenderId: "725402179817",
+  appId: "1:725402179817:web:b943d0005bd67a9e083878"
+};
+// ================================================================
+let auth, db;
+try {
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db   = firebase.firestore();
+} catch(e) {
+  window.location.href = 'index.html';
+}
+
+// ================================================================
+// MÉTA DES CATÉGORIES
+// ================================================================
+const META = {
+  definitions:{
+    label:'Tests de Définition', ico:'fa-book-open', col:'#c9a84c', bg:'rgba(201,168,76,.12)',
+    intro:"Une phrase vous est présentée avec un mot souligné. Identifiez sa définition exacte parmi les propositions. Aidez-vous du contexte et de l'étymologie du mot.",
+    rules:[
+      {i:'fa-magnifying-glass', t:'Lisez la phrase entière avant de vous focaliser sur le mot souligné.'},
+      {i:'fa-code-branch', t:'Repérez les préfixes et suffixes : -logie = science, -cide = qui tue, hyper- = excessif, in- = négation…'},
+      {i:'fa-circle-xmark', t:'Procédez par élimination : écartez les propositions clairement fausses en premier.'},
+      {i:'fa-circle-question', t:'Choisissez « Aucune réponse » seulement si vraiment aucune autre proposition ne convient.'},
+    ],
+    ex:{q:"Le patron est en butte à l'hostilité de ses ouvriers.",opts:['Le sujet de','Prêt à affronter','Exposé à','Aucune réponse'],c:2,e:'EN BUTTE À = être exposé à quelque chose de négatif. Image de la "butte" = cible de tir. Réponse C.'},
+  },
+  synonymes:{
+    label:'Synonymes', ico:'fa-arrows-left-right', col:'#3b72e0', bg:'rgba(59,114,224,.12)',
+    intro:"Un mot en MAJUSCULES vous est présenté. Trouvez parmi les propositions le mot dont le sens est le plus proche. Évalue votre vocabulaire et votre intelligence verbale.",
+    rules:[
+      {i:'fa-font', t:'Définissez mentalement le mot en majuscules avant de lire les propositions.'},
+      {i:'fa-triangle-exclamation', t:'Attention : synonyme et contraire se ressemblent parfois. Lisez bien la consigne.'},
+      {i:'fa-circle-xmark', t:'Éliminez les propositions clairement éloignées du sens avant de choisir.'},
+      {i:'fa-book', t:'Consultez un dictionnaire après chaque exercice pour ancrer les nouveaux mots.'},
+    ],
+    ex:{q:'MINUTIE',opts:['Parcimonie','Ingéniosité','Préciosité','Méticulosité'],c:3,e:'MINUTIE = application attentive aux petits détails → MÉTICULOSITÉ. Les autres ne partagent pas ce sens. Réponse D.'},
+  },
+  antonymes:{
+    label:'Antonymes', ico:'fa-left-right', col:'#f59e0b', bg:'rgba(245,158,11,.12)',
+    intro:"On vous demande de trouver le CONTRAIRE du mot en majuscules. Attention : les synonymes du mot cible sont souvent présents dans les propositions pour vous piéger.",
+    rules:[
+      {i:'fa-rotate', t:'Cherchez d\'abord la définition du mot en majuscules, puis son opposé exact.'},
+      {i:'fa-triangle-exclamation', t:'Les synonymes du mot sont souvent présents pour vous piéger. Restez vigilant.'},
+      {i:'fa-circle-xmark', t:'Éliminez les propositions qui s\'approchent du sens du mot, pas de son contraire.'},
+      {i:'fa-lightbulb', t:'Certains mots ont des antonymes peu évidents : Verve → platitude, Érudit → ignorant…'},
+    ],
+    ex:{q:'ALTRUISTE',opts:['Égoïste','Prétentieux','Philosophe','Misanthrope'],c:0,e:'ALTRUISTE = dévoué aux autres → son contraire est ÉGOÏSTE = centré sur soi. Réponse A.'},
+  },
+  paronymes:{
+    label:'Paronymes', ico:'fa-spell-check', col:'#10b981', bg:'rgba(16,185,129,.12)',
+    intro:"Les paronymes sont des mots qui se ressemblent à l'oral ou à l'écrit mais ont des sens différents. Choisissez celui qui convient à la phrase proposée.",
+    rules:[
+      {i:'fa-ear-listen', t:'Prononcez les deux mots mentalement : la ressemblance peut vous induire en erreur.'},
+      {i:'fa-pen', t:'Cherchez la définition précise de chaque paronyme avant de choisir.'},
+      {i:'fa-circle-xmark', t:'Ne vous fiez pas à la ressemblance visuelle ou phonique : c\'est exactement le piège.'},
+      {i:'fa-lightbulb', t:'Paires fréquentes : vénéneux/venimeux, éminent/imminent, conjoncture/conjecture…'},
+    ],
+    ex:{q:"Le grand air .......... l'appétit des jeunes enfants.",opts:['Simulait','Stimulait'],c:1,e:'STIMULER = encourager, exciter. SIMULER = imiter, feindre. Seul STIMULAIT convient ici. Réponse B.'},
+  },
+  locutions:{
+    label:'Proverbes & Locutions', ico:'fa-comment-dots', col:'#22c55e', bg:'rgba(34,197,94,.12)',
+    intro:"Une locution ou expression en majuscules vous est présentée. Trouvez sa signification exacte. Évalue votre culture générale et votre maîtrise de la langue française.",
+    rules:[
+      {i:'fa-glasses', t:'Lisez l\'expression dans sa globalité d\'abord, sans bloquer sur un seul mot.'},
+      {i:'fa-clock-rotate-left', t:'Pensez à l\'origine historique ou imagée de l\'expression.'},
+      {i:'fa-circle-xmark', t:'Écartez les réponses qui ne correspondent qu\'à une partie de l\'expression.'},
+      {i:'fa-lightbulb', t:'Coi = silencieux, en lice = en compétition, bayer = regarder… apprenez ces archaïsmes.'},
+    ],
+    ex:{q:"PRESSER QUELQU'UN COMME UN CITRON",opts:['Jouer avec ses nerfs','Pousser au suicide','Exploiter quelqu\'un','Avoir le teint pâle'],c:2,e:"Exploiter = extraire le maximum sans se soucier du reste, comme un citron pressé puis jeté. Réponse C."},
+  },
+  analogies:{
+    label:'Analogies Verbales', ico:'fa-link', col:'#a855f7', bg:'rgba(168,85,247,.12)',
+    intro:"Identifiez le rapport logique entre les deux premiers termes, puis appliquez ce même rapport pour trouver le quatrième terme manquant.",
+    rules:[
+      {i:'fa-arrows-split-up-and-left', t:'Identifiez la relation : catégorie, synonyme, opposition, outil/usage, contenant/contenu…'},
+      {i:'fa-font', t:'Respectez la nature grammaticale : si le 2ème terme est un nom, le 4ème l\'est aussi.'},
+      {i:'fa-rotate', t:'Le rapport est symétrique : vérifiez que la logique fonctionne dans les deux sens.'},
+      {i:'fa-circle-xmark', t:'Méfiez-vous des propositions liées à l\'un des termes sans respecter le même rapport.'},
+    ],
+    ex:{q:'Vache est à herbivore ce que loup est à…',opts:['Viande','Chien','Mammifère','Carnivore'],c:3,e:'Vache → herbivore (mode alimentaire). Loup → carnivore. C\'est aussi le seul adjectif parmi les options. Réponse D.'},
+  },
+  intrus:{
+    label:'Logique des Intrus', ico:'fa-magnifying-glass', col:'#ef4444', bg:'rgba(239,68,68,.12)',
+    intro:"Parmi les termes proposés, l'un n'appartient pas à la même catégorie que les autres. Identifiez-le.",
+    rules:[
+      {i:'fa-sitemap', t:'Cherchez le point commun entre la majorité des termes : c\'est la catégorie. L\'intrus en est exclu.'},
+      {i:'fa-layer-group', t:'La catégorie peut être sémantique, grammaticale ou logique (marques/types).'},
+      {i:'fa-triangle-exclamation', t:'Parfois plusieurs termes semblent différents — seul un est réellement l\'intrus.'},
+      {i:'fa-lightbulb', t:'Formez des groupes : lequel est le plus cohérent ? L\'intrus en sera exclu.'},
+    ],
+    ex:{q:'Baleine, Homme, Dauphin, Sardine, Chien — lequel est l\'intrus ?',opts:['Baleine','Dauphin','Sardine','Chien'],c:2,e:'SARDINE est l\'intrus : c\'est un poisson parmi des mammifères (baleine, homme, dauphin, chien). Réponse C.'},
+  },
+  series:{
+    label:'Séries Numériques', ico:'fa-infinity', col:'#06b6d4', bg:'rgba(6,182,212,.12)',
+    intro:"Identifiez la règle de progression d'une suite de nombres et complétez-la. Les règles peuvent être arithmétiques, géométriques ou alternées.",
+    rules:[
+      {i:'fa-calculator', t:'Calculez d\'abord les écarts entre chaque terme pour détecter une progression +/–.'},
+      {i:'fa-xmark', t:'Si les écarts ne sont pas constants, vérifiez les rapports (×, ÷) pour une progression géométrique.'},
+      {i:'fa-arrows-left-right', t:'Certaines suites entrelacent deux séries. Analysez séparément les termes pairs et impairs.'},
+      {i:'fa-bullseye', t:'Vérifiez votre résultat en l\'appliquant à rebours sur la suite.'},
+    ],
+    ex:{q:'3 – 7 – 16 – 35 – ?',opts:['70','74','68','80'],c:1,e:'Règle : ×2+1, ×2+2, ×2+3, ×2+4. Donc 35×2+4 = 70+4 = 74. Réponse B.'},
+  },
+};
+
+// ================================================================
+// QUESTIONS DU LIVRE — Eckenschwiller, Éd. Foucher
+// ================================================================
+// Questions chargées depuis Firestore via loadFromFirestore()
+
+// Ajouter les catégories antonymes et paronymes dans categories.html si manquants
+// Pour l'instant on les inclut dans le quiz
+
+// ================================================================
+// STATE
+// ================================================================
+const params = new URLSearchParams(location.search);
+const catId  = params.get('cat') || 'definitions';
+const meta   = META[catId] || META['definitions'];
+
+let currentUser    = null;
+let allExercices   = [];
+let exIdx          = 0;
+let qs             = [];
+let idx            = 0;
+let attempts       = 3;
+let answered       = false;
+let correct        = 0;
+let currentOptOrder = [];
+
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+
+// ================================================================
+// INIT — charge depuis Firestore
+// ================================================================
+async function loadFromFirestore() {
+  try {
+    const snap = await db.collection('categories').doc(catId)
+      .collection('exercices').orderBy('numero').get();
+    if(snap.empty){
+      document.getElementById('ldState').innerHTML =
+        '<div style="text-align:center;padding:3rem;color:var(--muted)">' +
+        '<i class="fa-solid fa-database" style="font-size:2rem;display:block;margin-bottom:1rem;opacity:.4"></i>' +
+        'Aucune question trouvée.<br><small>Importez un fichier JSON depuis le panneau admin.</small></div>';
+      return;
+    }
+    allExercices = snap.docs.map(d => ({
+      ex: d.data().titre || `Exercice ${d.data().numero}`,
+      qs: d.data().questions || []
+    }));
+    initPage();
+  } catch(e) {
+    document.getElementById('ldState').innerHTML =
+      '<div style="text-align:center;color:var(--err);padding:2rem">Erreur : ' + e.message + '</div>';
+  }
+}
+
+function initPage() {
+  const pill = document.getElementById('catPill');
+  pill.style.background = meta.bg;
+  pill.style.color       = meta.col;
+  pill.style.border      = `1px solid ${meta.col}33`;
+  pill.innerHTML = `<i class="fa-solid ${meta.ico}"></i> ${meta.label}`;
+  pill.style.display = 'inline-flex';
+  document.getElementById('ldState').style.display = 'none';
+  if(!allExercices.length){ showDone(); return; }
+  exIdx = 0;
+  loadExercice();
+}
+
+function loadExercice() {
+  if(exIdx >= allExercices.length){ showDone(); return; }
+  qs      = [...allExercices[exIdx].qs];
+  idx     = 0;
+  correct = 0;
+  shuffle(qs);
+  showMethod();
+}
+
+if(auth) {
+  auth.onAuthStateChanged(async user => {
+    if(!user){ location.href='index.html'; return; }
+    document.getElementById('authGuard').style.display = 'none';
+    currentUser = user;
+    await loadFromFirestore();
+  });
+} else {
+  location.href = 'index.html';
+}
+
+// ================================================================
+// METHOD SCREEN
+// ================================================================
+function showMethod() {
+  document.getElementById('msTitle').textContent = meta.label;
+  document.getElementById('msIntro').textContent = meta.intro;
+  const rulesEl = document.getElementById('msRules');
+  rulesEl.innerHTML = '';
+  meta.rules.forEach(r => {
+    rulesEl.innerHTML += `<div class="ms-rule"><i class="fa-solid ${r.i}"></i><span>${r.t}</span></div>`;
+  });
+  if(meta.ex){
+    const ex = meta.ex;
+    document.getElementById('msExQ').textContent = ex.q;
+    const optsEl = document.getElementById('msExOpts');
+    optsEl.innerHTML = '';
+    ['A','B','C','D'].forEach((l,i) => {
+      if(ex.opts[i]===undefined) return;
+      optsEl.innerHTML += `<div class="ms-eo ${i===ex.c?'ok':''}"><span class="ms-el">${i===ex.c?'<i class="fa-solid fa-check" style="font-size:.6rem"></i>':l}</span>${ex.opts[i]}</div>`;
+    });
+    document.getElementById('msExpl').innerHTML = `<i class="fa-solid fa-lightbulb" style="color:var(--gold);margin-right:.4rem"></i><strong>Explication :</strong> ${ex.e}`;
+    document.getElementById('msEx').style.display = 'block';
+  }
+  document.getElementById('msScreen').style.display = 'block';
+}
+
+function startQuiz() {
+  document.getElementById('msScreen').style.display = 'none';
+  document.getElementById('qCard').style.display    = 'block';
+  renderQ();
+}
+
+// ================================================================
+// RENDER QUESTION
+// ================================================================
+function renderQ() {
+  const q = qs[idx];
+  document.getElementById('qN').textContent   = idx + 1;
+  document.getElementById('qT').textContent   = qs.length;
+  document.getElementById('qTxt').textContent = q.q;
+  document.getElementById('topBar').style.width = (idx/qs.length*100)+'%';
+  attempts = 3; answered = false;
+  updateDots();
+  hideFb();
+  document.getElementById('nextBtn').className = 'next-btn';
+  buildOpts(q);
+}
+
+// Construit les options dans un ordre aléatoire
+// On stocke currentOptOrder = tableau des indices originaux dans l'ordre affiché
+function buildOpts(q) {
+  // Crée un tableau [0, 1, 2, ...] pour les indices des opts
+  const indices = q.opts.map((_,i) => i);
+  shuffle(indices);
+  currentOptOrder = indices;
+
+  const wrap = document.getElementById('optsWrap');
+  wrap.innerHTML = '';
+  const L = ['A','B','C','D'];
+  indices.forEach((origIdx, displayPos) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.dataset.origIdx = origIdx; // on stocke l'index original
+    btn.innerHTML = `<span class="oltr">${L[displayPos]}</span>${q.opts[origIdx]}`;
+    btn.onclick = () => pick(origIdx, btn);
+    wrap.appendChild(btn);
+  });
+}
+
+// ================================================================
+// PICK ANSWER
+// ================================================================
+function pick(origIdx, clickedBtn) {
+  if(answered) return;
+  const q    = qs[idx];
+  const btns = document.querySelectorAll('.opt');
+
+  if(origIdx === q.c) {
+    // ✅ CORRECT
+    answered = true; correct++;
+    clickedBtn.classList.add('correct'); clickedBtn.disabled = true;
+    btns.forEach(b => b.disabled = true);
+    showFb(`<i class="fa-solid fa-circle-check"></i><div><strong>Bonne réponse !</strong><div class="fb-expl">${q.e}</div></div>`,'ok');
+    document.getElementById('nextBtn').className = 'next-btn on';
+    save(idx + 1);
+  } else {
+    // ❌ WRONG
+    attempts--;
+    clickedBtn.classList.add('wrong'); clickedBtn.disabled = true;
+
+    // Shake
+    const card = document.getElementById('qCard');
+    card.style.animation='none'; card.offsetHeight;
+    card.style.animation='shake .35s ease'; setTimeout(()=>card.style.animation='', 400);
+
+    if(attempts === 0) {
+      btns.forEach(b => b.disabled = true);
+      showFb(`<i class="fa-solid fa-arrow-rotate-left"></i><div><strong>Tentatives épuisées !</strong><div class="fb-expl">La question va se réinitialiser. La réponse ne sera pas révélée — cherchez encore !</div></div>`,'warn');
+      setTimeout(() => {
+        hideFb();
+        attempts = 3;
+        answered = false;
+        updateDots();
+        // 🔄 On reconstruit les options dans un ordre DIFFÉRENT
+        buildOpts(qs[idx]);
+      }, 1500);
+    } else {
+      const s = attempts===1 ? "Il ne vous reste plus qu'une tentative !" : `Il vous reste ${attempts} tentatives.`;
+      showFb(`<i class="fa-solid fa-xmark-circle"></i><div><strong>Mauvaise réponse.</strong><div class="fb-expl">${s}</div></div>`,'err');
+      updateDots();
+      // 🔄 On efface le rouge après 1.2s et on mélange les options restantes
+      setTimeout(() => {
+        hideFb();
+        // Reconstruire les options (le bouton cliqué sera désactivé mais sans rouge)
+        const prevDisabled = [];
+        document.querySelectorAll('.opt').forEach(b => {
+          if(b.disabled && !b.classList.contains('wrong')) prevDisabled.push(parseInt(b.dataset.origIdx));
+        });
+        buildOpts(qs[idx]);
+        // Re-désactiver les options déjà utilisées (sans les colorer)
+        document.querySelectorAll('.opt').forEach(b => {
+          const oi = parseInt(b.dataset.origIdx);
+          if(oi === origIdx) { b.disabled = true; b.style.opacity='.45'; }
+          if(prevDisabled.includes(oi)) { b.disabled = true; b.style.opacity='.45'; }
+        });
+      }, 1200);
+    }
+  }
+}
+
+// ================================================================
+// NEXT + COMPLETION
+// ================================================================
+function nextQ() {
+  idx++;
+  if(idx >= qs.length){ showExDone(); return; }
+  const card = document.getElementById('qCard');
+  card.style.animation='none'; card.offsetHeight;
+  card.style.animation='si .32s ease';
+  renderQ();
+}
+
+function showExDone() {
+  if(exIdx >= allExercices.length - 1){ showDone(); return; }
+  const ex   = allExercices[exIdx];
+  const next = allExercices[exIdx + 1];
+  document.getElementById('qCard').style.display = 'none';
+  const dc = document.getElementById('doneCard');
+  dc.classList.add('on');
+  dc.innerHTML = `
+    <div class="done-ico" style="background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.22)">
+      <i class="fa-solid fa-star" style="color:var(--gold)"></i>
+    </div>
+    <h2>${ex.ex} terminé !</h2>
+    <div class="done-stats">
+      <div class="ds"><div class="n">${qs.length}</div><div class="l">Questions</div></div>
+      <div class="ds"><div class="n">${qs.length>0?Math.round(correct/qs.length*100):0}%</div><div class="l">Score</div></div>
+    </div>
+    <p style="color:var(--text2);font-size:.88rem;line-height:1.7;margin-bottom:1.5rem">
+      Excellent ! Passez à l'exercice suivant pour continuer.
+    </p>
+    <div class="done-btns">
+      <button class="db-gold" onclick="goNextEx()">
+        <i class="fa-solid fa-arrow-right"></i> ${next.ex}
+      </button>
+      <button class="db-ghost" onclick="location.href='categories.html'">
+        <i class="fa-solid fa-arrow-left"></i> Catégories
+      </button>
+    </div>
+  `;
+  saveProgress(exIdx + 1);
+}
+
+function goNextEx() {
+  exIdx++;
+  document.getElementById('doneCard').classList.remove('on');
+  document.getElementById('doneCard').innerHTML = '';
+  qs      = [...allExercices[exIdx].qs];
+  idx     = 0;
+  correct = 0;
+  shuffle(qs);
+  document.getElementById('qCard').style.display = 'block';
+  renderQ();
+}
+
+function showDone() {
+  document.getElementById('qCard').style.display   = 'none';
+  document.getElementById('msScreen').style.display = 'none';
+  const dc = document.getElementById('doneCard');
+  dc.classList.add('on');
+  dc.innerHTML = `
+    <div class="done-ico"><i class="fa-solid fa-trophy"></i></div>
+    <h2>Catégorie terminée !</h2>
+    <div class="done-stats">
+      <div class="ds"><div class="n">${allExercices.length}</div><div class="l">Exercices</div></div>
+      <div class="ds"><div class="n">100%</div><div class="l">Complété</div></div>
+    </div>
+    <p style="color:var(--text2);font-size:.88rem;line-height:1.7;margin-bottom:1.5rem">
+      Félicitations ! Vous avez complété tous les exercices de cette catégorie.
+    </p>
+    <div class="done-btns">
+      <button class="db-gold" onclick="restart()">
+        <i class="fa-solid fa-rotate-right"></i> Recommencer
+      </button>
+      <button class="db-ghost" onclick="location.href='categories.html'">
+        <i class="fa-solid fa-arrow-left"></i> Autres catégories
+      </button>
+    </div>
+  \`;
+  document.getElementById('topBar').style.width = '100%';
+  saveComplete();
+}
+
+function restart() {
+  exIdx   = 0;
+  idx     = 0;
+  correct = 0;
+  attempts = 3;
+  answered = false;
+  document.getElementById('doneCard').classList.remove('on');
+  document.getElementById('doneCard').innerHTML = '';
+  document.getElementById('qCard').style.display = 'none';
+  document.getElementById('topBar').style.width  = '0%';
+  loadExercice();
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+function updateDots(){
+  ['d1','d2','d3'].forEach((id,i) => {
+    document.getElementById(id).className='adot '+(i<attempts?'don':'doff');
+  });
+}
+function showFb(html,type){ const f=document.getElementById('fb'); f.innerHTML=html; f.className='fb '+type+' show'; }
+function hideFb(){ document.getElementById('fb').className='fb'; }
+async function saveProgress(exIdxDone){
+  if(!db||!currentUser) return;
+  try {
+    await db.collection('progress').doc(currentUser.uid)
+      .collection('categories').doc(catId).set({
+        solved: exIdxDone,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      },{merge:true});
+  } catch(e){}
+}
+
+async function saveComplete(){
+  if(!db||!currentUser) return;
+  try {
+    await db.collection('progress').doc(currentUser.uid)
+      .collection('categories').doc(catId).set({
+        solved: allExercices.length,
+        completed: true,
+        completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      },{merge:true});
+  } catch(e){}
+}
+</script>
+</body>
+</html>

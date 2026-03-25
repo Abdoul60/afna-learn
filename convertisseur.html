@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convertisseur Livre → JSON — AL-AFNA Learn</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{
+      --bg:#06080e;--sf:#0d1120;--sf2:#131828;--sf3:#192038;
+      --bd:#1e2a45;--bd2:#253050;
+      --gold:#c9a84c;--gold2:#e3c06b;
+      --text:#d8e4f8;--text2:#96aac8;--muted:#4e6080;
+      --ok:#22c55e;--err:#ef4444;--r:12px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;padding:2rem 1.25rem;}
+
+    .top{display:flex;align-items:center;gap:.7rem;margin-bottom:2rem;}
+    .logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#8a6018);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .logo i{font-size:.85rem;color:#06080e;}
+    h1{font-family:'Sora',sans-serif;font-size:1.1rem;font-weight:800;}
+    h1 b{color:var(--gold);}
+    .sub{font-size:.75rem;color:var(--muted);}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:1200px;margin:0 auto;}
+    @media(max-width:768px){.grid{grid-template-columns:1fr;}}
+
+    .panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;}
+    .panel-hdr{padding:1rem 1.25rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;}
+    .panel-hdr h2{font-family:'Sora',sans-serif;font-size:.92rem;font-weight:700;display:flex;align-items:center;gap:.5rem;}
+    .panel-hdr h2 i{color:var(--gold);}
+    .panel-body{padding:1.25rem;}
+
+    .field{margin-bottom:1rem;}
+    .field label{display:block;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem;}
+    .field select,.field input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:.65rem .9rem;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.85rem;outline:none;transition:border-color .18s;}
+    .field select:focus,.field input:focus{border-color:var(--gold);}
+
+    textarea{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:.9rem;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.83rem;outline:none;resize:vertical;line-height:1.7;transition:border-color .18s;}
+    textarea:focus{border-color:var(--gold);}
+    textarea::placeholder{color:var(--muted);}
+
+    .btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.9rem;border:none;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:1rem;}
+    .btn-gold{background:var(--gold);color:#06080e;}
+    .btn-gold:hover{background:var(--gold2);transform:translateY(-1px);}
+    .btn-gold:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+    .btn-ghost{background:var(--sf2);color:var(--text2);border:1px solid var(--bd)!important;}
+    .btn-ghost:hover{background:var(--sf3);}
+
+    .json-out{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:1rem;font-family:monospace;font-size:.76rem;color:#9ecbff;line-height:1.7;max-height:460px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;min-height:100px;}
+    .json-out.empty{color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:.83rem;display:flex;align-items:center;justify-content:center;text-align:center;padding:3rem;}
+
+    .status{display:flex;align-items:center;gap:.5rem;padding:.65rem .9rem;border-radius:8px;font-size:.82rem;margin-top:.9rem;}
+    .st-thinking{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);color:var(--gold);}
+    .st-ok{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18);color:var(--ok);}
+    .st-err{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);color:var(--err);}
+
+    .spin{animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .copy-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .9rem;border-radius:7px;background:rgba(201,168,76,.1);color:var(--gold);border:none;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:'Plus Jakarta Sans',sans-serif;}
+    .copy-btn:hover{background:rgba(201,168,76,.2);}
+    .dl-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem .9rem;border-radius:7px;background:rgba(34,197,94,.08);color:var(--ok);border:none;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .18s;font-family:'Plus Jakarta Sans',sans-serif;}
+    .dl-btn:hover{background:rgba(34,197,94,.15);}
+
+    .tip{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:1rem;font-size:.78rem;color:var(--text2);line-height:1.7;margin-bottom:1rem;}
+    .tip strong{color:var(--gold);}
+
+    .ex-box{background:var(--sf3);border:1px solid var(--bd);border-radius:8px;padding:.9rem;font-size:.76rem;color:var(--text2);line-height:1.8;font-family:monospace;margin-top:.5rem;white-space:pre-wrap;}
+
+    .actions-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.9rem;}
+
+    .counter{font-size:.72rem;color:var(--muted);margin-top:.4rem;}
+    .counter span{color:var(--gold);font-weight:700;}
+  </style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+  <div>
+    <h1><b>AL-AFNA</b> Convertisseur</h1>
+    <div class="sub">Livre → JSON automatiquement grâce à l'IA</div>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- GAUCHE : INPUT -->
+  <div>
+    <div class="panel">
+      <div class="panel-hdr">
+        <h2><i class="fa-solid fa-paste"></i> Texte du livre</h2>
+      </div>
+      <div class="panel-body">
+
+        <div class="tip">
+          <strong>Comment ça marche :</strong><br>
+          1. Copie le texte d'un exercice depuis le PDF<br>
+          2. Colle-le dans la zone ci-dessous<br>
+          3. Remplis les informations du livre<br>
+          4. Clique <strong>Convertir</strong> → JSON généré automatiquement
+        </div>
+
+        <div class="field">
+          <label>Catégorie</label>
+          <select id="catSelect">
+            <option value="definitions">Définitions</option>
+            <option value="synonymes">Synonymes</option>
+            <option value="antonymes">Antonymes</option>
+            <option value="paronymes">Paronymes</option>
+            <option value="locutions">Proverbes & Locutions</option>
+            <option value="analogies">Analogies Verbales</option>
+            <option value="intrus">Logique des Intrus</option>
+            <option value="series">Séries Numériques</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Numéro de l'exercice</label>
+          <input type="number" id="exNum" value="1" min="1">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div class="field">
+            <label>Titre du livre</label>
+            <input type="text" id="livreTitle" value="Tous les tests psychotechniques" placeholder="Ex: Tests psychotechniques">
+          </div>
+          <div class="field">
+            <label>Auteur</label>
+            <input type="text" id="livreAuteur" value="Eckenschwiller" placeholder="Ex: Eckenschwiller">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div class="field">
+            <label>Année</label>
+            <input type="number" id="livreAnnee" value="2016" placeholder="2016">
+          </div>
+          <div class="field">
+            <label>Contenu</label>
+            <select id="premiumSel">
+              <option value="false">Gratuit</option>
+              <option value="true">Premium</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Texte de l'exercice (copié depuis le PDF)</label>
+          <textarea id="inputText" rows="14" placeholder="Exemple :
+
+Exercice 1.
+> Choisissez le synonyme du mot en majuscules.
+
+1. EXHORTER
+A Inciter
+B Continuer
+C Perturber
+D Persuader
+
+2. TARAUDER
+A Tourmenter
+B Accidenter
+C Exacerber
+D Chaparder
+
+CORRIGÉS
+1. A  2. A  ..."></textarea>
+          <div class="counter">Caractères : <span id="charCount">0</span></div>
+        </div>
+
+        <button class="btn btn-gold" id="convertBtn" onclick="convert()">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Convertir en JSON
+        </button>
+
+        <div id="statusBox" style="display:none"></div>
+
+      </div>
+    </div>
+
+    <!-- Exemple de texte -->
+    <div class="panel" style="margin-top:1.5rem">
+      <div class="panel-hdr">
+        <h2><i class="fa-solid fa-lightbulb"></i> Exemple de texte à coller</h2>
+      </div>
+      <div class="panel-body">
+        <div class="ex-box">Exercice 2.
+> Choisissez le synonyme.
+
+1. LANTERNER
+A Éclairer
+B Presser
+C Musarder
+D Entraîner
+
+2. ACRIMONIE
+A Avarice
+B Douceur
+C Hargne
+D Économie
+
+CORRIGÉS
+1. C Lanterner = lambiner
+2. C Acrimonie = aigreur</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DROITE : OUTPUT -->
+  <div>
+    <div class="panel">
+      <div class="panel-hdr">
+        <h2><i class="fa-solid fa-code"></i> JSON généré</h2>
+        <div id="outputActions" style="display:none">
+          <div class="actions-row">
+            <button class="copy-btn" onclick="copyJSON()"><i class="fa-solid fa-copy"></i> Copier</button>
+            <button class="dl-btn" onclick="downloadJSON()"><i class="fa-solid fa-download"></i> Télécharger</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="json-out empty" id="jsonOut">
+          <div>
+            <i class="fa-solid fa-code" style="font-size:2rem;display:block;margin-bottom:.75rem;opacity:.3"></i>
+            Le JSON apparaîtra ici après la conversion
+          </div>
+        </div>
+
+        <div id="statsBox" style="display:none;margin-top:1rem">
+          <div style="display:flex;gap:1rem;flex-wrap:wrap">
+            <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:.7rem 1rem;flex:1;text-align:center">
+              <div style="font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:800;color:var(--gold)" id="statQ">0</div>
+              <div style="font-size:.72rem;color:var(--muted)">Questions extraites</div>
+            </div>
+            <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:.7rem 1rem;flex:1;text-align:center">
+              <div style="font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:800;color:var(--ok)" id="statOk">0</div>
+              <div style="font-size:.72rem;color:var(--muted)">Avec explication</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:1.5rem">
+          <div class="field">
+            <label><i class="fa-solid fa-layer-group" style="color:var(--gold);margin-right:.3rem"></i> Accumuler plusieurs exercices</label>
+          </div>
+          <p style="font-size:.78rem;color:var(--text2);line-height:1.65;margin-bottom:.9rem">
+            Convertis exercice par exercice. Le JSON final se construit automatiquement. Quand tu as tous les exercices d'une catégorie, télécharge le fichier complet.
+          </p>
+          <button class="btn btn-ghost" onclick="addToFull()" id="addBtn" style="display:none">
+            <i class="fa-solid fa-plus"></i> Ajouter à la catégorie complète
+          </button>
+          <div id="fullPreview" style="display:none;margin-top:1rem">
+            <div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem">
+              Fichier complet en cours — <span id="fullStats" style="color:var(--gold)"></span>
+            </div>
+            <div class="actions-row">
+              <button class="dl-btn" onclick="downloadFull()"><i class="fa-solid fa-download"></i> Télécharger le fichier complet</button>
+              <button class="copy-btn" onclick="resetFull()" style="background:rgba(239,68,68,.08);color:var(--err)"><i class="fa-solid fa-trash"></i> Réinitialiser</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Instructions Firestore -->
+    <div class="panel" style="margin-top:1.5rem">
+      <div class="panel-hdr">
+        <h2><i class="fa-solid fa-circle-info"></i> Après la conversion</h2>
+      </div>
+      <div class="panel-body">
+        <div style="font-size:.82rem;color:var(--text2);line-height:1.8">
+          <div style="margin-bottom:.6rem">
+            <i class="fa-solid fa-circle-1" style="color:var(--gold);margin-right:.4rem"></i>
+            Télécharge le fichier JSON
+          </div>
+          <div style="margin-bottom:.6rem">
+            <i class="fa-solid fa-circle-2" style="color:var(--gold);margin-right:.4rem"></i>
+            Ouvre <strong style="color:var(--text)">admin.html</strong> sur ton site
+          </div>
+          <div style="margin-bottom:.6rem">
+            <i class="fa-solid fa-circle-3" style="color:var(--gold);margin-right:.4rem"></i>
+            Va dans <strong style="color:var(--text)">Importer JSON</strong>
+          </div>
+          <div>
+            <i class="fa-solid fa-circle-4" style="color:var(--gold);margin-right:.4rem"></i>
+            Glisse le fichier → les questions arrivent dans Firestore
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Compte les caractères
+document.getElementById('inputText').addEventListener('input', function(){
+  document.getElementById('charCount').textContent = this.value.length;
+});
+
+let currentJSON   = null;
+let fullData      = null; // fichier accumulé
+
+// ── CONVERSION ───────────────────────────────────────────────────
+async function convert(){
+  const text    = document.getElementById('inputText').value.trim();
+  const cat     = document.getElementById('catSelect').value;
+  const exNum   = parseInt(document.getElementById('exNum').value) || 1;
+  const livre   = document.getElementById('livreTitle').value.trim();
+  const auteur  = document.getElementById('livreAuteur').value.trim();
+  const annee   = parseInt(document.getElementById('livreAnnee').value) || 2024;
+  const premium = document.getElementById('premiumSel').value === 'true';
+
+  if(!text){ alert('Collez d\'abord le texte du livre.'); return; }
+
+  const btn = document.getElementById('convertBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner spin"></i> Conversion en cours…';
+  showStatus('thinking', '<i class="fa-solid fa-brain spin"></i> L\'IA analyse le texte et extrait les questions…');
+  document.getElementById('jsonOut').className = 'json-out';
+  document.getElementById('jsonOut').textContent = '';
+
+  const catLabels = {
+    definitions:'Définitions', synonymes:'Synonymes', antonymes:'Antonymes',
+    paronymes:'Paronymes', locutions:'Proverbes & Locutions',
+    analogies:'Analogies Verbales', intrus:'Logique des Intrus', series:'Séries Numériques'
+  };
+
+  const prompt = `Tu es un assistant qui extrait des questions de quiz depuis du texte de livre psychotechnique.
+
+Voici le texte d'un exercice de la catégorie "${catLabels[cat]}" (exercice numéro ${exNum}) :
+
+---
+${text}
+---
+
+Extrait TOUTES les questions et génère un JSON valide avec cette structure EXACTE :
+{
+  "livre": "${livre}",
+  "auteur": "${auteur}",
+  "annee": ${annee},
+  "premium": ${premium},
+  "categories": [
+    {
+      "id": "${cat}",
+      "label": "${catLabels[cat]}",
+      "exercices": [
+        {
+          "numero": ${exNum},
+          "titre": "Exercice ${exNum}",
+          "questions": [
+            {
+              "q": "texte de la question",
+              "opts": ["option A", "option B", "option C", "option D"],
+              "c": 0,
+              "e": "explication de la bonne réponse"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+RÈGLES IMPORTANTES :
+- "c" est l'INDEX (0,1,2,3) de la bonne réponse dans "opts"
+- "opts" contient uniquement les textes des options SANS les lettres A/B/C/D
+- "e" est une explication courte et pédagogique de la bonne réponse (basée sur les corrigés si présents)
+- Si les corrigés donnent une définition, inclus-la dans "e"
+- Extrais TOUTES les questions sans exception
+- Réponds UNIQUEMENT avec le JSON valide, sans texte avant ni après, sans backticks`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+
+    if(data.error){
+      showStatus('err', '<i class="fa-solid fa-circle-xmark"></i> Erreur API : ' + data.error.message);
+      return;
+    }
+
+    let raw = data.content?.[0]?.text || '';
+    // Nettoie les backticks si présents
+    raw = raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+
+    let parsed;
+    try { parsed = JSON.parse(raw); }
+    catch(e){
+      // Essaie d'extraire le JSON du texte
+      const match = raw.match(/\{[\s\S]*\}/);
+      if(match) parsed = JSON.parse(match[0]);
+      else throw new Error('JSON invalide dans la réponse');
+    }
+
+    currentJSON = parsed;
+    const questions = parsed?.categories?.[0]?.exercices?.[0]?.questions || [];
+    const withExpl  = questions.filter(q => q.e && q.e.length > 5).length;
+
+    // Affiche le JSON coloré
+    document.getElementById('jsonOut').textContent = JSON.stringify(parsed, null, 2);
+    document.getElementById('outputActions').style.display = 'block';
+    document.getElementById('addBtn').style.display = 'flex';
+    document.getElementById('statsBox').style.display = 'block';
+    document.getElementById('statQ').textContent  = questions.length;
+    document.getElementById('statOk').textContent = withExpl;
+
+    showStatus('ok', `<i class="fa-solid fa-circle-check"></i> ${questions.length} questions extraites avec succès !`);
+
+    // Auto-incrément exercice
+    document.getElementById('exNum').value = exNum + 1;
+
+  } catch(e){
+    showStatus('err', '<i class="fa-solid fa-circle-xmark"></i> Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Convertir en JSON';
+  }
+}
+
+// ── ACCUMULATION ─────────────────────────────────────────────────
+function addToFull(){
+  if(!currentJSON) return;
+  const cat = currentJSON.categories[0];
+  const ex  = cat.exercices[0];
+
+  if(!fullData){
+    fullData = {
+      livre:   currentJSON.livre,
+      auteur:  currentJSON.auteur,
+      annee:   currentJSON.annee,
+      premium: currentJSON.premium,
+      categories: [{
+        id:        cat.id,
+        label:     cat.label,
+        exercices: [ex]
+      }]
+    };
+  } else {
+    const existingCat = fullData.categories.find(c => c.id === cat.id);
+    if(existingCat){
+      const existingEx = existingCat.exercices.find(e => e.numero === ex.numero);
+      if(existingEx){
+        // Remplace si déjà existant
+        existingCat.exercices = existingCat.exercices.filter(e => e.numero !== ex.numero);
+      }
+      existingCat.exercices.push(ex);
+      existingCat.exercices.sort((a,b) => a.numero - b.numero);
+    } else {
+      fullData.categories.push({id: cat.id, label: cat.label, exercices: [ex]});
+    }
+  }
+
+  // Mise à jour affichage
+  const totalQ = fullData.categories.reduce((sum, c) =>
+    sum + c.exercices.reduce((s, e) => s + (e.questions?.length||0), 0), 0);
+  const totalEx = fullData.categories.reduce((sum, c) => sum + c.exercices.length, 0);
+  document.getElementById('fullStats').textContent = `${totalEx} exercices — ${totalQ} questions`;
+  document.getElementById('fullPreview').style.display = 'block';
+
+  showStatus('ok', `<i class="fa-solid fa-check"></i> Ajouté ! Fichier complet : ${totalEx} exercices, ${totalQ} questions`);
+}
+
+// ── TÉLÉCHARGEMENTS ──────────────────────────────────────────────
+function downloadJSON(){
+  if(!currentJSON) return;
+  const cat = currentJSON.categories[0];
+  const ex  = currentJSON.categories[0].exercices[0];
+  dl(currentJSON, `${cat.id}_exercice${ex.numero}.json`);
+}
+
+function downloadFull(){
+  if(!fullData) return;
+  const name = fullData.livre.replace(/\s+/g,'_').toLowerCase() + '_' + fullData.annee + '.json';
+  dl(fullData, name);
+}
+
+function dl(data, filename){
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+function copyJSON(){
+  if(!currentJSON) return;
+  navigator.clipboard.writeText(JSON.stringify(currentJSON, null, 2))
+    .then(() => showStatus('ok','<i class="fa-solid fa-check"></i> Copié dans le presse-papiers !'));
+}
+
+function resetFull(){
+  if(!confirm('Réinitialiser le fichier complet ?')) return;
+  fullData = null;
+  document.getElementById('fullPreview').style.display = 'none';
+}
+
+// ── UI HELPERS ───────────────────────────────────────────────────
+function showStatus(type, html){
+  const box = document.getElementById('statusBox');
+  box.style.display = 'flex';
+  box.className = 'status st-' + type;
+  box.innerHTML = html;
+}
+</script>
+</body>
+</html>
